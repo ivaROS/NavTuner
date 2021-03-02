@@ -1,0 +1,6 @@
+[submodule "code/gazebo_utils"]
+	path = code/gazebo_utils
+	url = https://github.gatech.edu/ivabots/gazebo_utils.git
+[submodule "code/scripts/scripts/d_star"]
+	path = code/scripts/scripts/d_star
+	url = https://github.com/avgaydashenko/d_star.git
