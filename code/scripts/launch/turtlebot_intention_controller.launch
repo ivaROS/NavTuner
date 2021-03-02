@@ -1,0 +1,28 @@
+<launch>
+  <arg name="global_planner_name" default="global_planner"/>
+
+  <arg name="cmd_topic" default="cmd_vel_mux/input/navi"/>
+  <arg name="global_path_topic" default="$(arg global_planner_name)/navfn_planner/plan"/>
+  <arg name="image_topic" default="/camera/depth/image_raw"/>
+  <arg name="pose_feedback_topic" default="/move_base/feedback"/>
+  <arg name="goal_topic" default="/move_base_simple/goal"/>
+  <arg name="middle_goal_topic" default="/temp/goal"/>
+<arg name="scan_topic" default="/point_scan"/>
+
+  <node name="$(arg global_planner_name)" pkg="customized_nav_fn" type="customized_navfn_node" output="screen">
+    <rosparam file="$(find customized_nav_fn)/config/common_costmap_params.yaml" command="load" ns="costmap"/>
+    <rosparam file="$(find customized_nav_fn)/config/global_costmap_params.yaml" command="load"/>
+    <remap from="$(arg global_planner_name)/goal" to="$(arg goal_topic)"/>
+  </node>
+
+  <node name="intention_controller" pkg="intention_ros" type="intention_controller.py" output="screen">
+    <remap from="global_path" to="$(arg global_path_topic)"/>
+    <remap from="depth_image" to="$(arg image_topic)"/>
+    <remap from="pose_feedback" to="$(arg pose_feedback_topic)"/>
+    <remap from="goal" to="$(arg goal_topic)"/>
+    <remap from="goal_pub" to="$(arg middle_goal_topic)"/>
+    <remap from="cmd" to="$(arg cmd_topic)"/>
+  </node>
+
+</launch>
+
