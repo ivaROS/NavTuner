@@ -4,7 +4,6 @@ from collections import deque
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from efficientnet_pytorch.model import efficientnet
 
 
 class Flatten(nn.Module):
@@ -457,44 +456,6 @@ class MultiDQN(nn.Module):
             pred = layer(state)
             qval = pred[..., :-1] + pred[..., -1].unsqueeze(-1)
             qvals.append(qval)
-        return qvals
-
-
-class CNNDQN(nn.Module):
-
-    def __init__(self, input_dim, output_dim, aux=False):
-        super(CNNDQN, self).__init__()
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.aux = aux
-
-        # self.cnn = SimpleCNN(self.input_dim)
-        self.cnn = efficientnet('efficientnet-b0', True, 1, False, self.input_dim)
-        if aux:
-            self.density = nn.Sequential(
-            nn.Linear(self.input_dim, 128),
-            nn.ReLU(),
-            nn.Linear(128, 4)
-        )
-        self.fc = nn.Sequential(
-            nn.Linear(self.input_dim, 256),
-            nn.ReLU(),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, self.output_dim)
-        )
-        for layer in self.fc:
-            if hasattr(layer, 'weight'):
-                nn.init.orthogonal_(layer.weight)
-            if hasattr(layer, 'bias'):
-                nn.init.constant_(layer.bias, 0)
-
-    def forward(self, state):
-        state = self.cnn(state)
-        qvals = self.fc(state)
-        if self.aux:
-            d = self.density(state)
-            return qvals, d
         return qvals
 
 

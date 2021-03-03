@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset
-from efficientnet_pytorch.model import efficientnet
 
 
 class LaserScanDataset(Dataset):
@@ -92,14 +91,12 @@ class CNNClassifier(nn.Module):
         self.num_labels = num_labels
         self.conv1 = nn.Conv1d(1, hidden_size, kernel_size, padding=kernel_size // 2)
         self.conv2 = nn.Conv1d(hidden_size, hidden_size, kernel_size, padding=kernel_size // 2)
-        # self.cnn = efficientnet('efficientnet-b0', True, 1, False, self.hidden_size)
         self.fc = nn.Linear(hidden_size * 640, num_labels)
 
     def forward(self, x):
         x = x.float()
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        # x = self.cnn(x)
         x = self.fc(x.view(x.shape[0], -1))
 
         return x
@@ -112,14 +109,12 @@ class CNNRegressor(nn.Module):
         self.hidden_size = hidden_size
         self.conv1 = nn.Conv1d(1, hidden_size, kernel_size, padding=kernel_size // 2)
         self.conv2 = nn.Conv1d(hidden_size, hidden_size, kernel_size, padding=kernel_size // 2)
-        # self.cnn = efficientnet('efficientnet-b0', True, 1, False, self.hidden_size)
         self.fc = nn.Linear(hidden_size * 640, 1)
 
     def forward(self, x):
         x = x.float()
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        # x = self.cnn(x)
         x = self.fc(x.view(x.shape[0], -1))
 
         return x
@@ -174,7 +169,6 @@ class CNNClassifierBranch(nn.Module):
         self.num_labels2 = num_labels2
         self.conv1 = nn.Conv1d(1, hidden_size, kernel_size, padding=kernel_size // 2)
         self.conv2 = nn.Conv1d(hidden_size, hidden_size, kernel_size, padding=kernel_size // 2)
-        # self.cnn = efficientnet('efficientnet-b0', True, 1, False, self.hidden_size)
         self.fc1 = nn.Linear(hidden_size * 640, num_labels1)
         self.fc2 = nn.Linear(hidden_size * 640, num_labels2)
 
@@ -182,7 +176,6 @@ class CNNClassifierBranch(nn.Module):
         x = x.float()
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        # x = self.cnn(x)
         y1 = self.fc1(x.view(x.shape[0], -1))
         y2 = self.fc2(x.view(x.shape[0], -1))
 
@@ -196,7 +189,6 @@ class CNNRegressorBranch(nn.Module):
         self.hidden_size = hidden_size
         self.conv1 = nn.Conv1d(1, hidden_size, kernel_size, padding=kernel_size // 2)
         self.conv2 = nn.Conv1d(hidden_size, hidden_size, kernel_size, padding=kernel_size // 2)
-        # self.cnn = efficientnet('efficientnet-b0', True, 1, False, self.hidden_size)
         self.fc1 = nn.Linear(hidden_size * 640, 1)
         self.fc2 = nn.Linear(hidden_size * 640, 1)
 
@@ -204,7 +196,6 @@ class CNNRegressorBranch(nn.Module):
         x = x.float()
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        # x = self.cnn(x)
         y1 = self.fc1(x.view(x.shape[0], -1))
         y2 = self.fc2(x.view(x.shape[0], -1))
 
