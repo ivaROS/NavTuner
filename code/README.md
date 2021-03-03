@@ -40,7 +40,7 @@ Naming format should follow ```{robotmodel}_{local_planner_name}_controller.laun
 1. Complete step 1 and 2 above.
 2. Prepare the NavTuners. Go to ```scripts/scripts``` and modify ```gazebo_master.py``` for linear NavTuners, ```deep_networks.py``` for NN/CNN NavTuners, and ```DQN.py``` for RL NavTuners. Linear models are implemented with ```scikit-learn``` while NN/CNN/RL models are implemented with ```pytorch```.
 3. Go to ```gazebo_master.py``` for experiments with linear NavTuners, ```gazebo_dl.py``` for NN/CNN NavTuners, and ```gazebo_rl.py``` for RL NavTuners. Fill out envs/scenes, controllers, and random seeds with what you would like to test with. Run the file using python2.
-4. 4. There is default to be no Gazebo GUI, if you want to see exact testing details from Gazebo GUI, go to ```configs/launch``` and find the launch file that launches the specific world. In the format of ```gazebo_{robot_name}_{world_name}_world.launch```.
+4. There is default to be no Gazebo GUI, if you want to see exact testing details from Gazebo GUI, go to ```configs/launch``` and find the launch file that launches the specific world. In the format of ```gazebo_{robot_name}_{world_name}_world.launch```.
 
 ## Notice
 1. We limit PyTorch thread number to ```1``` by default, because multi-thread caused problems during our experiment. If you want to enable multi-thread, please comment out all appearance of ```torch.set_num_threads(1)```, and use at your own risk.
