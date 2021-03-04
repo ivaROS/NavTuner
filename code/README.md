@@ -1,4 +1,4 @@
-# NavTuner [arxiv](https://arxiv.org/abs/2103.01464)
+# NavTuner
 This is the training/testing/evaluation code for NavTuner. This readme aims to guide you through the basic usage of this code. The code is tested with Ubuntu 16.04 and PyTorch 1.0 with CPU.
 
 ## Functionality

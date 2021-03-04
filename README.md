@@ -1,4 +1,4 @@
-# NavTuner [Under Construction]
+# NavTuner [Under Construction][[arxiv](https://arxiv.org/abs/2103.01464)]
 Learning based policy tuner for obtaining a family of navigation policies.
 
 ## Supplementary Materials
