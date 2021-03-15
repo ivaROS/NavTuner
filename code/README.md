@@ -42,6 +42,14 @@ Naming format should follow ```{robotmodel}_{local_planner_name}_controller.laun
 3. Go to ```gazebo_master.py``` for experiments with linear NavTuners, ```gazebo_dl.py``` for NN/CNN NavTuners, and ```gazebo_rl.py``` for RL NavTuners. Fill out envs/scenes, controllers, and random seeds with what you would like to test with. Run the file using python2.
 4. There is default to be no Gazebo GUI, if you want to see exact testing details from Gazebo GUI, go to ```configs/launch``` and find the launch file that launches the specific world. In the format of ```gazebo_{robot_name}_{world_name}_world.launch```.
 
+## How to Test against Different Environment
+1. Make the environment map, both ```.pgm``` file and ```.yaml``` file, and place them under the ```configs/maps``` directory.
+2. Make a launch file for your environment.
+3. Create a new class for your environment in ```scripts/scripts/testing_scenarios.py```. If you want to run automatic experiements with your environments, you need to specify how random start/goal are chosen. If you want to place random obstacles, you also need to specify how/where those obstacles are placed.
+4. Follow steps on running w/o or w/ NavTuner to run experiments.
+
 ## Notice
-1. We limit PyTorch thread number to ```1``` by default, because multi-thread caused problems during our experiment. If you want to enable multi-thread, please comment out all appearance of ```torch.set_num_threads(1)```, and use at your own risk.
-2. During our experiments, occasionaly some NavTuners may cause ```move_base``` to crash right after navigation starts. We avoid this in experiments by starting the NavTuners a few seconds (2s in our experiments) later after navigation starts. If you experience ```move_base``` crashes, try increasing this delay.
+1. If you want to place different types of obstacles, you need to first make ```.sdf``` model files for them, and place the files under ```configs/models``` directory. Then, you need to modify the ```spawn_obstacle``` function in ```scripts/scripts/gazebo_driver_v2.py``` to include your obstacles. Finally, you need to specify how/where these obstacles are placed in the class of your environment in ```scripts/scripts/testing_scenarios.py```.
+2. We record all the data using ROS bags, and you can change this when you do automatic experiments in the corresponding python files. If you want to modify/make your own recorder, you can do this in ```scripts/scripts/result_recorder.py```.
+3. We limit PyTorch thread number to ```1``` by default, because multi-thread caused problems during our experiment. If you want to enable multi-thread, please comment out all appearance of ```torch.set_num_threads(1)```, and use at your own risk.
+4. During our experiments, occasionaly some NavTuners may cause ```move_base``` to crash right after navigation starts. We avoid this in experiments by starting the NavTuners a few seconds (2s in our experiments) later after navigation starts. If you experience ```move_base``` crashes, try increasing this delay.
