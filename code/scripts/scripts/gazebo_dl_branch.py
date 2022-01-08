@@ -1,3 +1,4 @@
+from __future__ import print_function
 import Queue
 import os
 import pickle
@@ -70,7 +71,7 @@ class GazeboDL(GazeboTester):
                                                       controller_args=controller_args)
                             task.update(
                                 controller_args)  # Adding controller arguments to main task dict for easy logging
-                            print "Running test..."
+                            print("Running test...")
 
                             # master = rosgraph.Master('/mynode')
 
@@ -117,21 +118,21 @@ class GazeboDL(GazeboTester):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -140,11 +141,11 @@ class GazeboDL(GazeboTester):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
 
 def train(epoch, model, dataloader, loss_fn, optimizer, scheduler=None, epochs=0):
@@ -244,7 +245,7 @@ def test(read_path, ranges, save_path, suffix='gt', cnn=False, checkpoint=None, 
         # '''
         # models = pickle.load(open(filename, 'rb'))
         end_time = time.time()
-        print "Total time: " + str(end_time - start_time)
+        print("Total time: " + str(end_time - start_time))
         model.eval()
         models = {param: model}
     # '''
@@ -271,7 +272,7 @@ def test(read_path, ranges, save_path, suffix='gt', cnn=False, checkpoint=None, 
     master.waitToFinish()
     master.shutdown()
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
     # '''
 
 

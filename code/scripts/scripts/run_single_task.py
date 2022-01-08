@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import rospkg
 
 import tf
@@ -75,7 +76,7 @@ start_time = time.time()
 scenario.setupScenario()
 end_time = time.time()
 
-print str(end_time-start_time)
+print(str(end_time-start_time))
 
 # from result_recorder import PoseRecorder
 # bag = rosbag.Bag(filename, 'w')

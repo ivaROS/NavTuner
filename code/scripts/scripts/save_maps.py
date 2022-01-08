@@ -1,3 +1,4 @@
+from __future__ import print_function
 import copy
 import rospy
 import subprocess
@@ -67,31 +68,31 @@ class GazeboMapSaver(GazeboMaster):
                 task["pid"] = os.getpid()
 
                 if self.had_error:
-                    print >> sys.stderr
+                    print(file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
             self.gazebo_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
 
 class MapCoordinator(MultiMasterCoordinator):

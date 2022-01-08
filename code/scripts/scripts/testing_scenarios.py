@@ -1,3 +1,4 @@
+from __future__ import print_function
 import rospkg
 import time
 
@@ -80,7 +81,7 @@ class TestingScenarios:
             elif scenario_type == "corridor_zigzag_door":
                 return CorridorZigzagDoorScenario(task=task, gazebo_driver=self.gazebo_driver)
             else:
-                print "Error! Unknown scenario type [" + scenario_type + "]"
+                print("Error! Unknown scenario type [" + scenario_type + "]")
                 return None
         elif "init_pose" in task and "goal" in task and "world" in task:
             return TestingScenario(task["world"], task["init_pose"], task["goal"], self.gazebo_driver)
@@ -127,7 +128,7 @@ class TestingScenario(object):
         return goal
 
     def setupScenario(self):
-        print "Resetting robot..."
+        print("Resetting robot...")
         # TODO: Check if reset successful; if not, wait briefly and try again,
         # eventually fail and throw error
         self.gazebo_driver.checkServicesTopics(10)

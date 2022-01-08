@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import rospy
 import random
 import sys, os, time
@@ -32,20 +33,20 @@ import std_msgs.msg as std_msgs
 def load_model_xml(filename):
     if os.path.exists(filename):
         if os.path.isdir(filename):
-            print "Error: file name is a path?", filename
+            print("Error: file name is a path?", filename)
             sys.exit(0)
 
         if not os.path.isfile(filename):
-            print "Error: unable to open file", filename
+            print("Error: unable to open file", filename)
             sys.exit(0)
     else:
-        print "Error: file does not exist", filename
+        print("Error: file does not exist", filename)
         sys.exit(0)
 
     f = open(filename, 'r')
     model_xml = f.read()
     if model_xml == "":
-        print "Error: file is empty", filename
+        print("Error: file is empty", filename)
         sys.exit(0)
 
     return model_xml
@@ -310,7 +311,7 @@ class GazeboDriver():
         for name in barrel_names:
             res = self.deleteModel(name=name)
             if not res.success:
-                print res.status_message
+                print(res.status_message)
 
     def moveObstacles(self, n, minx=None, miny=None, maxx=None, maxy=None, grid_spacing=None, random=False,
                       region_num=5,
@@ -402,10 +403,10 @@ class GazeboDriver():
                 self.spawn_obstacle(name, model_type, pose)
 
         for name in barrel_names:
-            print "Deleting: " + str(name)
+            print("Deleting: " + str(name))
             res = self.deleteModel(name=name)
             if not res.success:
-                print res.status_message
+                print(res.status_message)
 
     def barrel_points(self, xmins, ymins, xmaxs, ymaxs, min_dist, num_barrels, max_tries=2500, random=False,
                       region_num=5,

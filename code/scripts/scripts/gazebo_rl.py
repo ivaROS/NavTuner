@@ -1,3 +1,4 @@
+from __future__ import print_function
 import Queue
 import multiprocessing as mp
 import os
@@ -70,7 +71,7 @@ class GazeboRL(GazeboTester):
                                                       controller_args=controller_args)
                             task.update(
                                 controller_args)  # Adding controller arguments to main task dict for easy logging
-                            print "Running test..."
+                            print("Running test...")
 
                             # master = rosgraph.Master('/mynode')
 
@@ -160,21 +161,21 @@ class GazeboRL(GazeboTester):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -183,11 +184,11 @@ class GazeboRL(GazeboTester):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
 
 class GazeboRLBC(GazeboTester):
@@ -238,7 +239,7 @@ class GazeboRLBC(GazeboTester):
                                                       controller_args=controller_args)
                             task.update(
                                 controller_args)  # Adding controller arguments to main task dict for easy logging
-                            print "Running test..."
+                            print("Running test...")
 
                             # master = rosgraph.Master('/mynode')
 
@@ -310,21 +311,21 @@ class GazeboRLBC(GazeboTester):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -333,11 +334,11 @@ class GazeboRLBC(GazeboTester):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
 
 class GazeboRLPredict(GazeboTester):
@@ -389,7 +390,7 @@ class GazeboRLPredict(GazeboTester):
                                                       controller_args=controller_args)
                             task.update(
                                 controller_args)  # Adding controller arguments to main task dict for easy logging
-                            print "Running test..."
+                            print("Running test...")
 
                             # master = rosgraph.Master('/mynode')
 
@@ -461,21 +462,21 @@ class GazeboRLPredict(GazeboTester):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -484,11 +485,11 @@ class GazeboRLPredict(GazeboTester):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
 
 def warm_start(read_path, save_path, suffix, checkpoint=None, aux=False, double=False):
@@ -559,7 +560,7 @@ def warm_start(read_path, save_path, suffix, checkpoint=None, aux=False, double=
     master.waitToFinish()
     master.shutdown()
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
 
 
 def train(save_path, suffix, checkpoint=None, aux=False, double=False):
@@ -607,7 +608,7 @@ def train(save_path, suffix, checkpoint=None, aux=False, double=False):
     #            + 'a' + str(action_space) + 'seed' + str(s0) + '_' + str(se) + '.pt'
     # model.save_model(filename)
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
 
 
 def test(read_path, save_path, suffix='dqn', scene=None, double=False, id=0):
@@ -657,7 +658,7 @@ def test(read_path, save_path, suffix='dqn', scene=None, double=False, id=0):
     master.waitToFinish()
     master.shutdown()
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
 
 
 def print_result(save_path, suffix=['dqn']):

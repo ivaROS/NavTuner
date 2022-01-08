@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import copy
 
 import genpy
@@ -61,10 +62,10 @@ class RosMsgUnicodeErrors:
 def port_in_use(port):
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
         if sock.connect_ex(('127.0.0.1', port)) == 0:
-            print "Port " + str(port) + " is in use"
+            print("Port " + str(port) + " is in use")
             return True
         else:
-            print "Port " + str(port) + " is not in use"
+            print("Port " + str(port) + " is not in use")
             return False
 
 
@@ -99,7 +100,7 @@ class GazeboMaster(mp.Process):
 
         self.gui = True
 
-        print "New master"
+        print("New master")
 
         self.ros_master_uri = "http://localhost:" + str(self.ros_port)
         self.gazebo_master_uri = "http://localhost:" + str(self.gazebo_port)
@@ -118,9 +119,9 @@ class GazeboMaster(mp.Process):
             self.process_tasks()
             time.sleep(5)
             if not self.is_shutdown:
-                print >> sys.stderr, "(Not) Relaunching on " + str(
-                    os.getpid()) + ", ROS_MASTER_URI=" + self.ros_master_uri
-        print "Run totally done"
+                print("(Not) Relaunching on " + str(
+                    os.getpid()) + ", ROS_MASTER_URI=" + self.ros_master_uri, file=sys.stderr)
+        print("Run totally done")
 
     def process_tasks(self):
         self.roslaunch_core()
@@ -177,7 +178,7 @@ class GazeboMaster(mp.Process):
                             #     dr_costmap = dynamic_reconfigure.client.Client('/move_base/local_costmap', timeout=30)
                             #     dr_costmap.update_configuration({'height': look_ahead, 'width': look_ahead,
                             #                                      'resolution': 0.01 * look_ahead})
-                            print "Running test..."
+                            print("Running test...")
 
                             # master = rosgraph.Master('/mynode')
 
@@ -220,21 +221,21 @@ class GazeboMaster(mp.Process):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -243,11 +244,11 @@ class GazeboMaster(mp.Process):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
     def start_core(self):
 
@@ -259,9 +260,9 @@ class GazeboMaster(mp.Process):
         # my_env["ROS_MASTER_URI"] = self.ros_master_uri
         # my_env["GAZEBO_MASTER_URI"] = self.gazebo_master_uri
 
-        print "Starting core..."
+        print("Starting core...")
         self.core = subprocess.Popen(my_command.split())  # preexec_fn=os.setsid
-        print "Core started! [" + str(self.core.pid) + "]"
+        print("Core started! [" + str(self.core.pid) + "]")
 
     def roslaunch_core(self):
 
@@ -314,7 +315,7 @@ class GazeboMaster(mp.Process):
             if not self.gazebo_launch._shutting_down:
                 return
             else:
-                print "Gazebo crashed, restarting"
+                print("Gazebo crashed, restarting")
 
         if self.gazebo_launch is not None:
             self.gazebo_launch.shutdown()
@@ -339,7 +340,7 @@ class GazeboMaster(mp.Process):
         try:
             msg = rospy.wait_for_message("/odom", Odometry, 30)
         except rospy.exceptions.ROSException:
-            print "Error! odometry not received!"
+            print("Error! odometry not received!")
             return False
 
         return True
@@ -356,7 +357,7 @@ class GazeboMaster(mp.Process):
     def return_result(self, result):
         resultcopy = copy.deepcopy(result)
         # resultcopy.pop("laser_scan")
-        print "Returning completed task: " + str(resultcopy)
+        print("Returning completed task: " + str(resultcopy))
         self.result_queue.put(result)
         self.task_queue.task_done()
 
@@ -417,7 +418,7 @@ class GazeboTester(GazeboMaster):
                                                       controller_args=controller_args)
                             task.update(
                                 controller_args)  # Adding controller arguments to main task dict for easy logging
-                            print "Running test..."
+                            print("Running test...")
 
                             # master = rosgraph.Master('/mynode')
 
@@ -465,21 +466,21 @@ class GazeboTester(GazeboMaster):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
             with self.kill_flag.get_lock():
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -488,11 +489,11 @@ class GazeboTester(GazeboMaster):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         # self.core.kill()
         # os.killpg(os.getpgid(self.core.pid), signal.SIGTERM)
-        print "All cleaned up"
+        print("All cleaned up")
 
 
 class MultiMasterCoordinator:
@@ -631,7 +632,7 @@ class MultiMasterCoordinator:
 
                 # print "Result of " + task["world"] + ":" + task["controller"] + "= " + str(task["result"])
                 queue.task_done()
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 # print "No results!"
                 time.sleep(1)
 
@@ -653,18 +654,18 @@ class MultiMasterCoordinator:
         # sys.exit(0)
 
     def waitToFinish(self):
-        print "Waiting until everything done!"
+        print("Waiting until everything done!")
         self.task_queue.join()
-        print "All tasks processed!"
+        print("All tasks processed!")
         with self.soft_shutdown.get_lock():
             self.soft_shutdown.value = True
 
         # The problem is that this won't happen if I end prematurely...
         self.result_queue.join()
-        print "All results processed!"
+        print("All results processed!")
 
         for result in self.result_list:
-            print result
+            print(result)
 
     # This list should be elsewhere, possibly in the configs package
     def addTasks(self, tasks):
@@ -684,7 +685,7 @@ def generate_training_data(tasks, path=None):
     master.waitToFinish()
     master.shutdown()
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
 
 
 def find_all_success(file):
@@ -965,7 +966,7 @@ def test(read_path, params, ranges, save_path, suffix='gt', scene=None, id=0):
     # '''
     models = pickle.load(open(filename, 'rb'))
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
     start_time = time.time()
     result_recorders = [{"topic": "result"}, {"topic": "time"}, {"topic": "path_length"},
                         {"topic": "predict"}, {"topic": "accuracy"}]
@@ -989,7 +990,7 @@ def test(read_path, params, ranges, save_path, suffix='gt', scene=None, id=0):
     master.shutdown()
     # '''
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
 
 
 def test_gt(read_path, params, ranges, save_path, scene=None, id=0):
@@ -1028,7 +1029,7 @@ def test_default(save_path, scene=None, id=0):
     master.waitToFinish()
     master.shutdown()
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
     # '''
     # params = {'max_global_plan_lookahead_dist': 3.}
 

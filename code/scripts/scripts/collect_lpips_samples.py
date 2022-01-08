@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import rospy
 import random
 import sys, os, time
@@ -27,20 +28,20 @@ import pickle
 def load_model_xml(filename):
     if os.path.exists(filename):
         if os.path.isdir(filename):
-            print "Error: file name is a path?", filename
+            print("Error: file name is a path?", filename)
             sys.exit(0)
 
         if not os.path.isfile(filename):
-            print "Error: unable to open file", filename
+            print("Error: unable to open file", filename)
             sys.exit(0)
     else:
-        print "Error: file does not exist", filename
+        print("Error: file does not exist", filename)
         sys.exit(0)
 
     f = open(filename, 'r')
     model_xml = f.read()
     if model_xml == "":
-        print "Error: file is empty", filename
+        print("Error: file is empty", filename)
         sys.exit(0)
 
     return model_xml
@@ -192,9 +193,9 @@ class Prototype():
 
     def moveBarrels(self, n):
         for i, xy in enumerate(self.barrel_points(self.minx, self.miny, self.maxx, self.maxy, self.grid_spacing, n)):
-            print i, xy
+            print(i, xy)
             name = "barrel{}".format(i)
-            print name
+            print(name)
 
             pose = Pose()
             pose.position.x = xy[0]

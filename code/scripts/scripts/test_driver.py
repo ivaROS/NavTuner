@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import rospy
 from copy import deepcopy
 
@@ -282,7 +283,7 @@ class OdomChecker:
 
     def checkOdom(self, event=None):
         try:
-            print "timer callback"
+            print("timer callback")
             now = rospy.Time.now()
             past = now - rospy.Duration(5.0)
             trans = self.tfBuffer.lookup_transform_full(
@@ -293,10 +294,10 @@ class OdomChecker:
                 fixed_frame='odom',
                 timeout=rospy.Duration(1.0)
             )
-            print str(trans)
+            print(str(trans))
             displacement = math.sqrt(
                 trans.transform.translation.x * trans.transform.translation.x + trans.transform.translation.y * trans.transform.translation.y)
-            print "Odom displacement: " + str(displacement)
+            print("Odom displacement: " + str(displacement))
             if (displacement < .05):
                 self.not_moving = True
 
@@ -309,16 +310,16 @@ class OdomChecker:
                 fixed_frame='odom',
                 timeout=rospy.Duration(1.0)
             )
-            print str(trans)
+            print(str(trans))
             displacement = math.sqrt(
                 trans.transform.translation.x * trans.transform.translation.x + trans.transform.translation.y * trans.transform.translation.y)
-            print "map displacement: " + str(displacement)
+            print("map displacement: " + str(displacement))
             if (displacement > .1):
                 self.collided = True
 
 
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException), e:
-            print e
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+            print(e)
             pass
 
 
@@ -348,9 +349,9 @@ class OdomAccumulator:
 
 def run_testImpl(pose):
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -367,18 +368,18 @@ def run_testImpl(pose):
     goal.target_pose.header.stamp = rospy.Time.now()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     client.wait_for_result(rospy.Duration(300))
-    print "done!"
+    print("done!")
 
     # 3 means success, according to the documentation
     # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-    print "getting goal status"
+    print("getting goal status")
     print(client.get_goal_status_text())
-    print "done!"
-    print "returning state number"
+    print("done!")
+    print("returning state number")
     return client.get_state() == 3
 
 
@@ -418,9 +419,9 @@ def run_test(goal_pose):
 
     # client = actionlib.SimpleActionClient('global_planner', MoveBaseAction)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # print "waiting for server"
     # client.wait_for_server()
@@ -435,9 +436,9 @@ def run_test(goal_pose):
     # rospy.sleep(1.)
     r.sleep()
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     # r = rospy.Rate(5)
 
@@ -481,14 +482,14 @@ def run_test(goal_pose):
 
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -633,9 +634,9 @@ def run_test_predict(goal_pose, models, ranges, predict_recorder, truth, density
         accuracy[param] = 0.
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -646,9 +647,9 @@ def run_test_predict(goal_pose, models, ranges, predict_recorder, truth, density
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     start_time = rospy.Time.now()
 
@@ -719,14 +720,14 @@ def run_test_predict(goal_pose, models, ranges, predict_recorder, truth, density
         accuracy[param] /= max(num, 1)
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -760,9 +761,9 @@ def run_test_dl(goal_pose, models, ranges, predict_recorder, truth, density, suf
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -773,9 +774,9 @@ def run_test_dl(goal_pose, models, ranges, predict_recorder, truth, density, suf
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     start_time = rospy.Time.now()
 
@@ -850,14 +851,14 @@ def run_test_dl(goal_pose, models, ranges, predict_recorder, truth, density, suf
         accuracy[param] /= max(num, 1)
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -891,9 +892,9 @@ def run_test_dl_branch(goal_pose, models, ranges, predict_recorder, suffix='clas
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -904,9 +905,9 @@ def run_test_dl_branch(goal_pose, models, ranges, predict_recorder, suffix='clas
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     start_time = rospy.Time.now()
 
@@ -975,14 +976,14 @@ def run_test_dl_branch(goal_pose, models, ranges, predict_recorder, suffix='clas
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1015,9 +1016,9 @@ def run_test_rl(goal_pose, models, ranges, param, predict_recorder, reward_recor
     dr_controller = dynamic_reconfigure.client.Client(planner, timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1028,9 +1029,9 @@ def run_test_rl(goal_pose, models, ranges, param, predict_recorder, reward_recor
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1098,14 +1099,14 @@ def run_test_rl(goal_pose, models, ranges, param, predict_recorder, reward_recor
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1149,9 +1150,9 @@ def run_test_rl_bc(goal_pose, models, ranges, param, predict_recorder, truth, de
     dr_controller = dynamic_reconfigure.client.Client(planner, timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1162,9 +1163,9 @@ def run_test_rl_bc(goal_pose, models, ranges, param, predict_recorder, truth, de
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1222,14 +1223,14 @@ def run_test_rl_bc(goal_pose, models, ranges, param, predict_recorder, truth, de
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1262,9 +1263,9 @@ def run_test_rl_aux(goal_pose, models, ranges, param, predict_recorder, reward_r
     dr_controller = dynamic_reconfigure.client.Client(planner, timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1275,9 +1276,9 @@ def run_test_rl_aux(goal_pose, models, ranges, param, predict_recorder, reward_r
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1346,14 +1347,14 @@ def run_test_rl_aux(goal_pose, models, ranges, param, predict_recorder, reward_r
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1401,9 +1402,9 @@ def run_test_rl_bc_aux(goal_pose, models, ranges, param, predict_recorder, truth
     dr_controller = dynamic_reconfigure.client.Client(planner, timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1414,9 +1415,9 @@ def run_test_rl_bc_aux(goal_pose, models, ranges, param, predict_recorder, truth
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1475,14 +1476,14 @@ def run_test_rl_bc_aux(goal_pose, models, ranges, param, predict_recorder, truth
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1516,9 +1517,9 @@ def run_test_rl_double(goal_pose, models, ranges, param, predict_recorder, rewar
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1529,9 +1530,9 @@ def run_test_rl_double(goal_pose, models, ranges, param, predict_recorder, rewar
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1604,14 +1605,14 @@ def run_test_rl_double(goal_pose, models, ranges, param, predict_recorder, rewar
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1661,9 +1662,9 @@ def run_test_rl_bc_double(goal_pose, models, ranges, param, predict_recorder, tr
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1674,9 +1675,9 @@ def run_test_rl_bc_double(goal_pose, models, ranges, param, predict_recorder, tr
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1739,14 +1740,14 @@ def run_test_rl_bc_double(goal_pose, models, ranges, param, predict_recorder, tr
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1779,9 +1780,9 @@ def run_test_rl_predict_double(goal_pose, models, ranges, param, predict_recorde
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1792,9 +1793,9 @@ def run_test_rl_predict_double(goal_pose, models, ranges, param, predict_recorde
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     start_time = rospy.Time.now()
 
@@ -1846,14 +1847,14 @@ def run_test_rl_predict_double(goal_pose, models, ranges, param, predict_recorde
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -1888,9 +1889,9 @@ def run_test_rl_multi(goal_pose, models, ranges, param, predict_recorder, reward
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -1901,9 +1902,9 @@ def run_test_rl_multi(goal_pose, models, ranges, param, predict_recorder, reward
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
     r.sleep()
 
     start_time = rospy.Time.now()
@@ -1982,14 +1983,14 @@ def run_test_rl_multi(goal_pose, models, ranges, param, predict_recorder, reward
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -2038,9 +2039,9 @@ def run_test_rl_predict_multi(goal_pose, models, ranges, param, predict_recorder
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -2052,9 +2053,9 @@ def run_test_rl_predict_multi(goal_pose, models, ranges, param, predict_recorder
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     start_time = rospy.Time.now()
 
@@ -2109,14 +2110,14 @@ def run_test_rl_predict_multi(goal_pose, models, ranges, param, predict_recorder
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -2148,9 +2149,9 @@ def run_test_rl_predict(goal_pose, models, ranges, param, predict_recorder):
     dr_controller = dynamic_reconfigure.client.Client(planner, timeout=30)
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
-    print "waiting for server"
+    print("waiting for server")
     client.wait_for_server()
-    print "Done!"
+    print("Done!")
 
     # Create the goal point
     goal = MoveBaseGoal()
@@ -2161,9 +2162,9 @@ def run_test_rl_predict(goal_pose, models, ranges, param, predict_recorder):
     r.sleep()
 
     # Send the goal!
-    print "sending goal"
+    print("sending goal")
     client.send_goal(goal)
-    print "waiting for result"
+    print("waiting for result")
 
     start_time = rospy.Time.now()
 
@@ -2211,14 +2212,14 @@ def run_test_rl_predict(goal_pose, models, ranges, param, predict_recorder):
     path_length = odom_accumulator.getPathLength()
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
-        print "done!"
+        print("done!")
 
         # 3 means success, according to the documentation
         # http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
-        print "getting goal status"
+        print("getting goal status")
         print(client.get_goal_status_text())
-        print "done!"
-        print "returning state number"
+        print("done!")
+        print("returning state number")
         # return client.get_state() == 3
         state = client.get_state()
         if state == GoalStatus.SUCCEEDED:
@@ -2244,4 +2245,4 @@ if __name__ == "__main__":
         rospy.init_node('pips_test', anonymous=True)
         run_test()
     except rospy.ROSInterruptException:
-        print "Keyboard Interrupt"
+        print("Keyboard Interrupt")

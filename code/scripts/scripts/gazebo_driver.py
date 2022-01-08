@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import rospy
 import sys, os, time
 import random
@@ -17,27 +18,27 @@ def exception_wrap(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            print "Error:", e
+            print("Error:", e)
     return wrapper
 
 # Load model xml from file
 def load_model_xml(filename):
     if os.path.exists(filename):
         if os.path.isdir(filename):
-            print "Error: file name is a path?", filename
+            print("Error: file name is a path?", filename)
             sys.exit(0)
 
         if not os.path.isfile(filename):
-            print "Error: unable to open file", filename
+            print("Error: unable to open file", filename)
             sys.exit(0)
     else:
-        print "Error: file does not exist", filename
+        print("Error: file does not exist", filename)
         sys.exit(0)
 
     f = open(filename,'r')
     model_xml = f.read()
     if model_xml == "":
-        print "Error: file is empty", filename
+        print("Error: file is empty", filename)
         sys.exit(0)
 
     return model_xml
@@ -128,7 +129,7 @@ def barrel_points(xmin, ymin, xmax, ymax, grid_size, num_barrels):
 
     # Choose random indexes
     idx = random.sample(range(points.shape[0]), num_barrels)
-    print idx
+    print(idx)
 
     # Generate offsets
     off = np.random.rand(num_barrels, 2) * grid_size / 2.0
@@ -142,10 +143,10 @@ def barrel_points(xmin, ymin, xmax, ymax, grid_size, num_barrels):
 def spawn_barrels(n):
     position = []
     for i, xy in enumerate(barrel_points(-4.0, 1.0, 0.0, 5.0, 1.0, n)):
-        print i, xy
+        print(i, xy)
         position.append(xy)
         name = "barrel{}".format(i)
-        print name
+        print(name)
         spawn_barrel(xy, name)
     return position
 delete_model = exception_wrap(rospy.ServiceProxy('/gazebo/delete_model', gazebo_interface.DeleteModel))
@@ -166,4 +167,4 @@ if __name__ == "__main__":
         spawn_barrels(5)
         time.sleep(5)
     except rospy.ROSInterruptException:
-        print "Keyboard Interrupt"
+        print("Keyboard Interrupt")

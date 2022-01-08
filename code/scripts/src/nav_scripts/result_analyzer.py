@@ -1,3 +1,4 @@
+from __future__ import print_function
 import csv
 import time
 import math
@@ -127,7 +128,7 @@ class ResultAnalyzer:
         #gm.start()
 
         for result in results:
-            print result
+            print(result)
             #gm.task_queue.put(result)
 
     def getMaxTime(self):
@@ -138,7 +139,7 @@ class ResultAnalyzer:
                 time = entry['time']
                 if time > max_time:
                     max_time = time
-        print "Max time: " + str(max_time)
+        print("Max time: " + str(max_time))
 
 
     def computeStatistics(self, independent, dependent):
@@ -160,21 +161,21 @@ class ResultAnalyzer:
                     key_values[key] = set()
                 key_values[key].add(value)
         for num_barrels in key_values[independent[0]]:
-           print str(num_barrels) + " barrels:"
+           print(str(num_barrels) + " barrels:")
            for controller in sorted(key_values[independent[1]]):
                 total = 0
                 for result in key_values[dependent[0]]:
                     key = frozenset({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items())
                     if key in statistics:
                         total+= statistics[key]
-                print controller + " controller:"
+                print(controller + " controller:")
                 for result in key_values[dependent[0]]:
                     key = frozenset(
                         {independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items())
                     if key in sorted(statistics):
                         num = statistics[frozenset({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items())]
-                        print result + ": " + str(num) + "\t" + str(float(num)/total)
-                print ""
+                        print(result + ": " + str(num) + "\t" + str(float(num)/total))
+                print("")
 
     def generateTable(self):
         statistics = {}
@@ -201,21 +202,21 @@ class ResultAnalyzer:
                     key_values[key] = set()
                 key_values[key].add(value)
         for scenario in key_values["scenario"]:
-            print ""
-            print "Scenario: " + str(scenario)
+            print("")
+            print("Scenario: " + str(scenario))
 
-            print ""
+            print("")
 
-            print("| controller"),
+            print(("| controller"), end=' ')
             for result in key_values["result"]:
-                print(" | " + str(result)),
+                print((" | " + str(result)), end=' ')
 
 
             print("|")
 
 
             for i in range(len(key_values["result"])+1):
-                print("| -------"),
+                print(("| -------"), end=' ')
 
             print("|")
 
@@ -227,7 +228,7 @@ class ResultAnalyzer:
                     if key in statistics:
                         total += statistics[key]
 
-                print("| " + str(controller)),
+                print(("| " + str(controller)), end=' ')
                 for result in key_values["result"]:
                     key = frozenset(
                         {"controller": controller, "scenario": scenario, "result": result}.items())
@@ -237,9 +238,9 @@ class ResultAnalyzer:
                         path_time = np.mean(np.array(path_times[lookupkey]))/1e9
                         path_length = np.mean(np.array(path_lengths[lookupkey]))
 
-                        print("| " + "{0:.1f}".format(100*float(num) / total) + "% (" + str(num) + ") " + "<br>" + "{0:.2f}".format(path_length) + "m" + " <br>" + "{0:.2f}".format(path_time) + "s"),
+                        print(("| " + "{0:.1f}".format(100*float(num) / total) + "% (" + str(num) + ") " + "<br>" + "{0:.2f}".format(path_length) + "m" + " <br>" + "{0:.2f}".format(path_time) + "s"), end=' ')
                     else:
-                        print("| "),
+                        print(("| "), end=' ')
                 print("|")
 
     def generateGenericTable(self, independent, dependent, whitelist=None, blacklist=None):
@@ -301,10 +302,10 @@ class ResultAnalyzer:
                         #    num) + ") " + "<br>" + "{0:.2f}".format(path_length) + "m" + " <br>" + "{0:.2f}".format(
                         #    path_time) + "s"),
 
-                        print("| " + "{0:.1f}".format(100 * float(num) / total) + "% (" + str(
-                            num) + ") "),
+                        print(("| " + "{0:.1f}".format(100 * float(num) / total) + "% (" + str(
+                            num) + ") "), end=' ')
                     else:
-                        print("| "),
+                        print(("| "), end=' ')
 
                 dependent_value="SUCCEEDED"
                 lookupkey = frozenset(shared_conditions_dict.items() + {dependent: dependent_value}.items())
@@ -320,11 +321,11 @@ class ResultAnalyzer:
                     path_length = np.array(sum(path_length, []))
                     path_length = np.mean(path_length)
 
-                    print("| " + "{0:.2f}".format(path_length) + "m |" + "{0:.2f}".format(
-                        path_time) + "s"),
+                    print(("| " + "{0:.2f}".format(path_length) + "m |" + "{0:.2f}".format(
+                        path_time) + "s"), end=' ')
 
                 else:
-                    print("| "),
+                    print(("| "), end=' ')
                 print("|")
 
 
@@ -350,16 +351,16 @@ class ResultAnalyzer:
                                 pass
 
                     print("")
-                    print("| " + condition_name),
+                    print(("| " + condition_name), end=' ')
                     for result in key_values[dependent]:
-                        print(" | " + str(result)),
+                        print((" | " + str(result)), end=' ')
                         
-                    print(" | " + "path length | path time"),
+                    print((" | " + "path length | path time"), end=' ')
 
                     print("|")
 
                     for i in range(len(key_values[dependent]) + 3):
-                        print("| -------"),
+                        print(("| -------"), end=' ')
 
                     print("|")
 
@@ -369,7 +370,7 @@ class ResultAnalyzer:
 
                 for condition_value in sorted(key_values[condition_name]):
                     if depth == max_depth-1:
-                      print("| " + str(condition_value)),
+                      print(("| " + str(condition_value)), end=' ')
                     else:
                         print("")
                         print(condition_value + ":")
@@ -407,24 +408,24 @@ class ResultAnalyzer:
                     key_values[key] = set()
                 key_values[key].add(value)
 
-        print ""
+        print("")
 
-        print("| "),
+        print(("| "), end=' ')
         for scenario in sorted(key_values["scenario"]):
             if scenario == "corridor_zigzag":
-                print("| corridor <br> zigzag"),
+                print(("| corridor <br> zigzag"), end=' ')
             elif scenario == "corridor_zigzag_door":
-                print("| corridor <br> zigzag <br> door"),
+                print(("| corridor <br> zigzag <br> door"), end=' ')
             else:
-                print("| " + str(scenario)),
-        print "|"
+                print(("| " + str(scenario)), end=' ')
+        print("|")
 
         for i in range(len(key_values["scenario"])+1):
-            print("| -------"),
-        print "|"
+            print(("| -------"), end=' ')
+        print("|")
 
         for controller in sorted(key_values["controller"]):
-            print("| " + str(controller)),
+            print(("| " + str(controller)), end=' ')
             for scenario in sorted(key_values["scenario"]):
 
                 total = 0
@@ -444,9 +445,9 @@ class ResultAnalyzer:
                     path_time = np.mean(np.array(path_times[lookupkey])) / 1e9
                     path_length = np.mean(np.array(path_lengths[lookupkey]))
 
-                    print("| " + "{0:.1f}".format(100 * float(num) / total) + "% <br>" + "{0:.2f}".format(path_length) + "m"),
+                    print(("| " + "{0:.1f}".format(100 * float(num) / total) + "% <br>" + "{0:.2f}".format(path_length) + "m"), end=' ')
                 else:
-                    print("| 0.0%"),
+                    print(("| 0.0%"), end=' ')
             print("|")
 
 
@@ -472,7 +473,7 @@ class ResultAnalyzer:
             num_tasks += 1
             
         avg_time = total_time/num_tasks if num_tasks > 0 else 0
-        print  ': ' + str(avg_time/1e9) #tasks[0]['controller'] +
+        print(': ' + str(avg_time/1e9)) #tasks[0]['controller'] +
 
     def contains(self, task):
         stripped_task = {str(key): str(task[key]) for key,value in task.items()}
@@ -519,7 +520,7 @@ class ResultAnalyzer:
             
             if still_good:
                 good_seeds.append(seed)
-                print str(seed) + ": good"
+                print(str(seed) + ": good")
                 
         return good_seeds
 
@@ -546,7 +547,7 @@ class ResultAnalyzer:
                         statistics[conditionset] = statistics[conditionset] + 1
 
 
-        print controller1 + " : " + controller2
+        print(controller1 + " : " + controller2)
         for key,value in statistics.items():
-            print str(next(iter(key))) + " : " + str(value)
+            print(str(next(iter(key))) + " : " + str(value))
 

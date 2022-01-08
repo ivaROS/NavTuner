@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import multiprocessing as mp
 import os
 import sys
@@ -29,10 +30,10 @@ import datetime
 def port_in_use(port):
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
         if sock.connect_ex(('127.0.0.1', port)) == 0:
-            print "Port " + str(port) + " is in use"
+            print("Port " + str(port) + " is in use")
             return True
         else:
-            print "Port " + str(port) + " is not in use"
+            print("Port " + str(port) + " is not in use")
             return False
 
 
@@ -120,7 +121,7 @@ class MultiMasterCoordinator:
                             result_string+= str(k) + ":" + str(v) + ","
                     result_string += "]"
 
-                    print result_string
+                    print(result_string)
 
                     if "error" not in task:
                         self.result_list.append(result_string)
@@ -134,7 +135,7 @@ class MultiMasterCoordinator:
 
                     #print "Result of " + task["world"] + ":" + task["controller"] + "= " + str(task["result"])
                     queue.task_done()
-                except Queue.Empty, e:
+                except Queue.Empty as e:
                     #print "No results!"
                     time.sleep(1)
 
@@ -151,15 +152,15 @@ class MultiMasterCoordinator:
         self.should_shutdown = True
 
     def wait_to_finish(self):
-        print "Waiting until everything done!"
+        print("Waiting until everything done!")
         self.task_queue.join()
-        print "All tasks processed!"
+        print("All tasks processed!")
         with self.soft_shutdown.get_lock():
             self.soft_shutdown.value = True
 
         #The problem is that this won't happen if things end prematurely...
         self.result_queue.join()
-        print "All results processed!"
+        print("All results processed!")
 
 
     def add_tasks(self, tasks):
@@ -177,7 +178,7 @@ class MultiMasterCoordinator:
                     good_task = False
                     if key not in warned_keys:
                         warned_keys.add(key)
-                        print >> sys.stderr, "Key [" + key + "] is not in fieldnames! Skipping all tasks that include it"
+                        print("Key [" + key + "] is not in fieldnames! Skipping all tasks that include it", file=sys.stderr)
             return good_task
 
         for task in tasks:
@@ -186,7 +187,7 @@ class MultiMasterCoordinator:
             else:
                 num_skipped +=1
 
-        print "Finished adding tasks. Skipped [" + str(num_skipped) + "] tasks."
+        print("Finished adding tasks. Skipped [" + str(num_skipped) + "] tasks.")
 
 
 
@@ -215,7 +216,7 @@ class GazeboMaster(mp.Process):
         self.gui = True
 
 
-        print "New master"
+        print("New master")
 
         self.ros_master_uri = "http://localhost:" + str(self.ros_port)
         self.gazebo_master_uri = "http://localhost:" + str(self.gazebo_port)
@@ -239,8 +240,8 @@ class GazeboMaster(mp.Process):
             self.process_tasks()
             time.sleep(5)
             if not self.is_shutdown:
-                print >> sys.stderr, "(Not) Relaunching on " + str(os.getpid()) + ", ROS_MASTER_URI=" + self.ros_master_uri
-        print "Run totally done"
+                print("(Not) Relaunching on " + str(os.getpid()) + ", ROS_MASTER_URI=" + self.ros_master_uri, file=sys.stderr)
+        print("Run totally done")
 
     def process_tasks(self):
         self.roslaunch_core()
@@ -281,7 +282,7 @@ class GazeboMaster(mp.Process):
                                 self.roslaunch_controller(task["robot"], task["controller"], controller_args)
                                 task.update(controller_args)    #Adding controller arguments to main task dict for easy logging
 
-                                print "Running test..."
+                                print("Running test...")
 
                                 #master = rosgraph.Master('/mynode')
 
@@ -316,14 +317,14 @@ class GazeboMaster(mp.Process):
                 self.return_result(task)
 
                 if self.had_error:
-                    print >> sys.stderr, result
+                    print(result, file=sys.stderr)
 
 
-            except Queue.Empty, e:
+            except Queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
-                        print "Soft shutdown requested"
+                        print("Soft shutdown requested")
                 time.sleep(1)
 
 
@@ -331,7 +332,7 @@ class GazeboMaster(mp.Process):
                 if self.kill_flag.value:
                     self.shutdown()
 
-        print "Done with processing, killing launch files..."
+        print("Done with processing, killing launch files...")
         # It seems like killing the core should kill all of the nodes,
         # but it doesn't
         if self.gazebo_launch is not None:
@@ -340,11 +341,11 @@ class GazeboMaster(mp.Process):
         if self.controller_launch is not None:
             self.controller_launch.shutdown()
 
-        print "GazeboMaster shutdown: killing core..."
+        print("GazeboMaster shutdown: killing core...")
         self.core.shutdown()
         #self.core.kill()
 
-        print "All cleaned up"
+        print("All cleaned up")
 
 
     def roslaunch_core(self):
@@ -400,7 +401,7 @@ class GazeboMaster(mp.Process):
             if not self.robot_launch._shutting_down:
                 return
             else:
-                print "Error with robot, restarting"
+                print("Error with robot, restarting")
 
         if self.robot_launch is not None:
             self.robot_launch.shutdown()
@@ -426,7 +427,7 @@ class GazeboMaster(mp.Process):
         try:
             msg = rospy.wait_for_message("/odom", Odometry, 30)
         except rospy.exceptions.ROSException:
-            print "Error! /odom not received!"
+            print("Error! /odom not received!")
             return False
 
         return True
@@ -437,7 +438,7 @@ class GazeboMaster(mp.Process):
             if not self.gazebo_launch._shutting_down:
                 return
             else:
-                print "Gazebo crashed, restarting"
+                print("Gazebo crashed, restarting")
 
         if self.gazebo_launch is not None:
             self.gazebo_launch.shutdown()
@@ -474,7 +475,7 @@ class GazeboMaster(mp.Process):
         try:
             msg = rospy.wait_for_message("/clock", ClockMsg, 30)
         except rospy.exceptions.ROSException:
-            print "Error! clock not received!"
+            print("Error! clock not received!")
             return False
 
         return True
@@ -489,7 +490,7 @@ class GazeboMaster(mp.Process):
         self.shutdown()
 
     def return_result(self,result):
-        print "Returning completed task: " + str(result)
+        print("Returning completed task: " + str(result))
         self.result_queue.put(result)
         self.task_queue.task_done()
 
@@ -556,7 +557,7 @@ if __name__ == "__main__":
     #rospy.spin()
     master.shutdown()
     end_time = time.time()
-    print "Total time: " + str(end_time - start_time)
+    print("Total time: " + str(end_time - start_time))
 
 
 
