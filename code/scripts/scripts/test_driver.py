@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import rospy
 from copy import deepcopy
 
@@ -50,7 +55,7 @@ import time
 # from dynamic_reconfigure.server import Server
 # from /opt/ros/kinetic/share/teb_local_planner/cfg/TebLocalPlannerReconfigure.cfg import TebLocalPlannerReconfigure
 
-class ResultRecorder:
+class ResultRecorder(object):
     def __init__(self):
         self.lock = threading.Lock()
         self.vel_sub = rospy.Subscriber("navigation_velocity_smoother/raw_cmd_vel", Twist, self.twistCB, queue_size=1)
@@ -181,7 +186,7 @@ class ResultRecorder:
         rospy.logdebug("'Done' accomplished!")
 
 
-class BumperChecker:
+class BumperChecker(object):
     def __init__(self):
         self.sub = rospy.Subscriber("mobile_base/events/bumper", BumperEvent, self.bumperCB, queue_size=5)
         self.collided = False
@@ -191,7 +196,7 @@ class BumperChecker:
             self.collided = True
 
 
-class LaserScanSaver:
+class LaserScanSaver(object):
     def __init__(self, interval=15):
         self.sub = rospy.Subscriber("/scan", LaserScan, self.LaserScanCB)
         self.msgs = deque(maxlen=10)
@@ -210,7 +215,7 @@ class LaserScanSaver:
         return ranges
 
 
-class DepthSaver:
+class DepthSaver(object):
     def __init__(self, interval=15):
         self.sub = rospy.Subscriber("/camera/depth/image_raw", Image, self.DepthCB)
         self.msgs = deque(maxlen=10)
@@ -229,7 +234,7 @@ class DepthSaver:
         return msg
 
 
-class PositionChecker:
+class PositionChecker(object):
     def __init__(self):
         # self.sub = rospy.Subscriber("/odom", Odometry, self.positionCB)
         # self.tf = tf.TransformListener()
@@ -275,7 +280,7 @@ class PositionChecker:
 
 
 # Not currently in use
-class OdomChecker:
+class OdomChecker(object):
     def __init__(self):
         # self.odom_timer = rospy.Timer(period = rospy.Duration(1), callback = self.checkOdom)
         self.not_moving = False
@@ -323,7 +328,7 @@ class OdomChecker:
             pass
 
 
-class OdomAccumulator:
+class OdomAccumulator(object):
     def __init__(self):
         self.feedback_subscriber = rospy.Subscriber("move_base/feedback", MoveBaseActionFeedback, self.feedbackCB,
                                                     queue_size=5)
@@ -630,7 +635,7 @@ def run_test_predict(goal_pose, models, ranges, predict_recorder, truth, density
     dr_egocircle = dynamic_reconfigure.client.Client('/egocircle_node', timeout=30)
     # dr_costmap = dynamic_reconfigure.client.Client('/move_base/local_costmap', timeout=30)
     accuracy = {}
-    for param in models.keys():
+    for param in list(models.keys()):
         accuracy[param] = 0.
     client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 
@@ -686,7 +691,7 @@ def run_test_predict(goal_pose, models, ranges, predict_recorder, truth, density
                 laserscan = laserscan_saver.retrieve()
                 update = {}
                 # update_costmap = False
-                for param in models.keys():
+                for param in list(models.keys()):
                     value = models[param].predict(laserscan)[0]
                     pos_x = position_checker.position[0]
                     pos_y = position_checker.position[1]
@@ -716,7 +721,7 @@ def run_test_predict(goal_pose, models, ranges, predict_recorder, truth, density
     task_time = rospy.Time.now() - start_time
 
     path_length = odom_accumulator.getPathLength()
-    for param in accuracy.keys():
+    for param in list(accuracy.keys()):
         accuracy[param] /= max(num, 1)
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
@@ -786,7 +791,7 @@ def run_test_dl(goal_pose, models, ranges, predict_recorder, truth, density, suf
     counter = 0
     num = 0
     accuracy = {}
-    for param in models.keys():
+    for param in list(models.keys()):
         accuracy[param] = 0.
     while keep_waiting:
         state = client.get_state()
@@ -815,7 +820,7 @@ def run_test_dl(goal_pose, models, ranges, predict_recorder, truth, density, suf
                 laserscan = torch.tensor(laserscan)
                 laserscan = laserscan.unsqueeze(0)
                 # laserscan = laserscan.unsqueeze(1)
-                for param in models.keys():
+                for param in list(models.keys()):
                     with torch.no_grad():
                         value = models[param](laserscan)
                     pos_x = position_checker.position[0]
@@ -847,7 +852,7 @@ def run_test_dl(goal_pose, models, ranges, predict_recorder, truth, density, suf
     task_time = rospy.Time.now() - start_time
 
     path_length = odom_accumulator.getPathLength()
-    for param in accuracy.keys():
+    for param in list(accuracy.keys()):
         accuracy[param] /= max(num, 1)
     if result is None:
         # client.wait_for_result(rospy.Duration(45))
@@ -919,7 +924,7 @@ def run_test_dl_branch(goal_pose, models, ranges, predict_recorder, suffix='clas
     accuracy = {}
     p1 = 'max_depth'
     p2 = 'planner_frequency'
-    for param in models.keys():
+    for param in list(models.keys()):
         accuracy[param] = 0.
     while keep_waiting:
         state = client.get_state()
@@ -948,7 +953,7 @@ def run_test_dl_branch(goal_pose, models, ranges, predict_recorder, suffix='clas
                 laserscan = torch.tensor(laserscan)
                 laserscan = laserscan.unsqueeze(0)
                 # laserscan = laserscan.unsqueeze(1)
-                for param in models.keys():
+                for param in list(models.keys()):
                     with torch.no_grad():
                         value1, value2 = models[param](laserscan)
                     if suffix == 'classifier':
@@ -1123,8 +1128,8 @@ def run_test_rl(goal_pose, models, ranges, param, predict_recorder, reward_recor
             result = "UNKNOWN"
 
     if result == 'SUCCEEDED':
-        reward = 1000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
-                                                         - shortest_path[:-1, :]), axis=1)))/path_length
+        reward = old_div(1000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
+                                                         - shortest_path[:-1, :]), axis=1))),path_length)
     else:
         reward = -1000.
     rewards.append(reward)
@@ -1371,8 +1376,8 @@ def run_test_rl_aux(goal_pose, models, ranges, param, predict_recorder, reward_r
             result = "UNKNOWN"
 
     if result == 'SUCCEEDED':
-        reward = 1000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
-                                                         - shortest_path[:-1, :]), axis=1)))/path_length
+        reward = old_div(1000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
+                                                         - shortest_path[:-1, :]), axis=1))),path_length)
     else:
         reward = -1000.
     rewards.append(reward)
@@ -1629,8 +1634,8 @@ def run_test_rl_double(goal_pose, models, ranges, param, predict_recorder, rewar
             result = "UNKNOWN"
 
     if result == 'SUCCEEDED':
-        reward = 10000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
-                                                         - shortest_path[:-1, :]), axis=1)))/path_length
+        reward = old_div(10000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
+                                                         - shortest_path[:-1, :]), axis=1))),path_length)
     else:
         reward = -10000.
     rewards.append(reward)
@@ -2007,8 +2012,8 @@ def run_test_rl_multi(goal_pose, models, ranges, param, predict_recorder, reward
             result = "UNKNOWN"
 
     if result == 'SUCCEEDED':
-        reward = 10000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
-                                                         - shortest_path[:-1, :]), axis=1)))/path_length
+        reward = old_div(10000. * np.sum(np.sqrt(np.sum(np.square(shortest_path[1:, :]
+                                                         - shortest_path[:-1, :]), axis=1))),path_length)
     else:
         reward = -10000.
     rewards.append(reward)

@@ -1,4 +1,10 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import zip
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import rospkg
 import time
 
@@ -13,7 +19,7 @@ import pickle
 from a_star import AStarGraph, AStarSearch
 
 
-class TestingScenarios:
+class TestingScenarios(object):
     def __init__(self):
         self.gazebo_driver = GazeboDriver(as_node=False)
 
@@ -524,7 +530,7 @@ class EmptyScenario(TestingScenario):
 
         self.init_id = task["init_id"] if "init_id" in task else 0
 
-        self.target_id = task["target_id"] if "target_id" in task else (self.init_id + len(self.poses) / 2) % len(
+        self.target_id = task["target_id"] if "target_id" in task else (self.init_id + old_div(len(self.poses), 2)) % len(
             self.poses)
 
         self.random = np.random
@@ -538,7 +544,7 @@ class EmptyScenario(TestingScenario):
         ymin = xmin
 
         self.min_spacing = task["min_obstacle_spacing"] if "min_obstacle_spacing" in task \
-            else min(xmax - xmin, ymax - ymin) / np.sqrt(self.num_barrels) / 2 - 0.55
+            else old_div(old_div(min(xmax - xmin, ymax - ymin), np.sqrt(self.num_barrels)), 2) - 0.55
 
         # Zone1 = [[-8.5, 9.5], [8.5, -9.5]]
         # zones = [Zone1]
@@ -680,7 +686,7 @@ class MazeScenario(TestingScenario):
 
         self.init_id = task["init_id"] if "init_id" in task else 0
 
-        self.target_id = task["target_id"] if "target_id" in task else (self.init_id + len(self.poses) / 2) % len(
+        self.target_id = task["target_id"] if "target_id" in task else (self.init_id + old_div(len(self.poses), 2)) % len(
             self.poses)
 
         self.random = np.random
@@ -694,7 +700,7 @@ class MazeScenario(TestingScenario):
         ymin = xmin
 
         self.min_spacing = task["min_obstacle_spacing"] if "min_obstacle_spacing" in task \
-            else min(xmax - xmin, ymax - ymin) / np.sqrt(self.num_barrels) / 2 - 0.55
+            else old_div(old_div(min(xmax - xmin, ymax - ymin), np.sqrt(self.num_barrels)), 2) - 0.55
 
         # Zone1 = [[-8.5, 9.5], [8.5, -9.5]]
         # zones = [Zone1]
@@ -884,7 +890,7 @@ class MazeRLScenario(MazePredictScenario):
         # path, _ = AStarSearch((int(start[0]), int(start[1])), (int(goal[0]), int(goal[1])), graph)
         pf.replan()
         path = pf.get_path()
-        self.path = np.array(path) / multiplier - 10.
+        self.path = old_div(np.array(path), multiplier) - 10.
         # dt = time.time() - st
         # print(dt)
         # print()
@@ -1022,7 +1028,7 @@ class FourthFloorScenario(TestingScenario):
             dis = []
             for pose in self.target_poses:
                 dis.append(math.sqrt((init[0] - pose[0]) ** 2 + (init[1] - pose[1]) ** 2))
-            dis_idx = sorted(range(len(dis)), key=dis.__getitem__)
+            dis_idx = sorted(list(range(len(dis))), key=dis.__getitem__)
             init_rand = self.random.randint(1, 3)
             self.target_id = dis_idx[init_rand]
 

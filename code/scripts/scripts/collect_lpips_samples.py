@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import division
+from builtins import object
+from past.utils import old_div
 import rospy
 import random
 import sys, os, time
@@ -47,7 +50,7 @@ def load_model_xml(filename):
     return model_xml
 
 
-class Prototype():
+class Prototype(object):
     # Copied from pips_test: gazebo_driver.py
     def barrel_points(self, xmin, ymin, xmax, ymax, min_dist, num_barrels, max_tries=100):
         '''
@@ -123,7 +126,7 @@ class Prototype():
         threshold = 0.75
         num_angles = 51
         angles = np.linspace(-fov, fov, num_angles)
-        idx = np.around(angles / data.angle_increment).astype(np.int)
+        idx = np.around(old_div(angles, data.angle_increment)).astype(np.int)
         msg = np.array(data.ranges)
         idx += len(msg)//2 - idx[len(idx)//2]
         labels = np.zeros((num_angles, 2))

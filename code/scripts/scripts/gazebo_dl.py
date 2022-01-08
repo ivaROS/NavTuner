@@ -1,5 +1,11 @@
 from __future__ import print_function
-import Queue
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from past.utils import old_div
+import queue
 import os
 import pickle
 import sys
@@ -124,7 +130,7 @@ class GazeboDL(GazeboTester):
                     print(result, file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
@@ -166,7 +172,7 @@ def train(epoch, model, dataloader, loss_fn, optimizer, scheduler=None, epochs=0
         loss.backward()
         optimizer.step()
 
-    avg_train_loss = train_loss / train_examples
+    avg_train_loss = old_div(train_loss, train_examples)
     scheduler.step(avg_train_loss)
     print("Epoch: {}/{}\tAvg Train Loss: {:.4f}".format(epoch, epochs, avg_train_loss))
 
@@ -183,7 +189,7 @@ def test(read_path, ranges, save_path, suffix='gt', cnn=False, checkpoint=None, 
     if os.path.isfile(pickleload):
         models = {}
         checkpoints = pickle.load(open(pickleload, 'rb'))
-        for param in checkpoints.keys():
+        for param in list(checkpoints.keys()):
             ckpt = checkpoints[param]
             if suffix == 'regressor':
                 if cnn:

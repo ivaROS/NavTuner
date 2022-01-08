@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import rosbag
 from geometry_msgs.msg import Pose, PoseStamped
 from nav_msgs.msg import Odometry
@@ -9,7 +11,7 @@ from std_msgs.msg import String, Float32, Float64, Time, Float64MultiArray
 from cv_bridge import CvBridge
 
 
-class ResultRecorders:
+class ResultRecorders(object):
     def __init__(self, filename):
         if not filename[-4:] is '.bag':
             filename += '.bag'
@@ -61,7 +63,7 @@ class StringRecorder(ResultRecorder):
 
     def write(self, data):
         if isinstance(data, dict):
-            for key in data.keys():
+            for key in list(data.keys()):
                 entry = String()
                 entry.data = data[key]
                 self.bag.write(self.key + '_' + str(key), entry)
@@ -77,7 +79,7 @@ class TimeRecorder(ResultRecorder):
 
     def write(self, data):
         if isinstance(data, dict):
-            for key in data.keys():
+            for key in list(data.keys()):
                 entry = Time()
                 entry.data = data[key]
                 self.bag.write(self.key + '_' + str(key), entry)
@@ -93,7 +95,7 @@ class Float32Recorder(ResultRecorder):
 
     def write(self, data):
         if isinstance(data, dict):
-            for key in data.keys():
+            for key in list(data.keys()):
                 entry = Float32()
                 entry.data = data[key]
                 self.bag.write(self.key + '_' + str(key), entry)
@@ -109,7 +111,7 @@ class Float64Recorder(ResultRecorder):
 
     def write(self, data):
         if isinstance(data, dict):
-            for key in data.keys():
+            for key in list(data.keys()):
                 entry = Float64()
                 entry.data = data[key]
                 self.bag.write(self.key + '_' + str(key), entry)
@@ -125,7 +127,7 @@ class ArrayRecorder(ResultRecorder):
 
     def write(self, data):
         if isinstance(data, dict):
-            for key in data.keys():
+            for key in list(data.keys()):
                 entry = Float64MultiArray()
                 entry.data = data[key]
                 self.bag.write(self.key + '_' + str(key), entry)

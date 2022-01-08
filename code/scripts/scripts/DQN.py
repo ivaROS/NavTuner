@@ -1,4 +1,10 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import zip
+from builtins import next
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import random
 import numpy as np
 from collections import deque
@@ -12,7 +18,7 @@ class Flatten(nn.Module):
         return x.view(x.size(0), -1)
 
 
-class BasicBuffer:
+class BasicBuffer(object):
     def __init__(self, max_size):
         self.max_size = max_size
         self.buffer = deque(maxlen=max_size)
@@ -342,13 +348,12 @@ class SimpleCNN(nn.Module):
                 int(
                     np.floor(
                         (
-                            (
+                            old_div((
                                 dimension[i]
                                 + 2 * padding[i]
                                 - dilation[i] * (kernel_size[i] - 1)
                                 - 1
-                            )
-                            / stride[i]
+                            ), stride[i])
                         )
                         + 1
                     )
@@ -460,7 +465,7 @@ class MultiDQN(nn.Module):
         return qvals
 
 
-class DQNAgent:
+class DQNAgent(object):
     def __init__(self, state_space, action_space, learning_rate=3e-4, gamma=0.99,
                  buffer_size=10000, eps=1, eps_decay=.99, aux=False, double=False):
         self.state_space = state_space
@@ -623,7 +628,7 @@ class DQNAgent:
         self.model.eval()
 
 
-class MultiDQNAgent:
+class MultiDQNAgent(object):
     def __init__(self, state_space, learning_rate=3e-4, gamma=0.99,
                  buffer_size=6400, eps=1, eps_decay=.9993, aux=False, double=False):
         self.state_space = state_space

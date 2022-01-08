@@ -1,4 +1,8 @@
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import copy
 import rospy
 import subprocess
@@ -11,7 +15,7 @@ from gazebo_utils.gazebo_world_to_map import MapCreator
 from gazebo_master import GazeboMaster, MultiMasterCoordinator, port_in_use
 import sys
 import os
-import Queue
+import queue
 from testing_scenarios import TestingScenarios
 
 
@@ -71,7 +75,7 @@ class GazeboMapSaver(GazeboMaster):
                     print(file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()

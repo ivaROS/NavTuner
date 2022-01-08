@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import copy
 
 import genpy
@@ -17,7 +24,7 @@ import test_driver
 from gazebo_driver_v2 import GazeboDriver
 import rosgraph
 import threading
-import Queue
+import queue
 from ctypes import c_bool
 import codecs
 import signal
@@ -43,7 +50,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import LaserScan, Image
 
 
-class RosMsgUnicodeErrors:
+class RosMsgUnicodeErrors(object):
     def __init__(self):
         self.msg_type = None
 
@@ -142,7 +149,7 @@ class GazeboMaster(mp.Process):
                 filename = folder
                 if not os.path.isdir(folder):
                     os.makedirs(folder)
-                for key in task['params'].keys():
+                for key in list(task['params'].keys()):
                     filename += str(key) + str(task['params'][key]) + '_'
                 filename += 'seed' + str(task['seed'])
                 recorders = ResultRecorders(filename)
@@ -224,7 +231,7 @@ class GazeboMaster(mp.Process):
                     print(result, file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
@@ -296,7 +303,7 @@ class GazeboMaster(mp.Process):
         # Remapping stdout to /dev/null
         sys.stdout = open(os.devnull, "w")
 
-        for key, value in controller_args.items():
+        for key, value in list(controller_args.items()):
             var_name = "GM_PARAM_" + key.upper()
             value = str(value)
             os.environ[var_name] = value
@@ -469,7 +476,7 @@ class GazeboTester(GazeboMaster):
                     print(result, file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
@@ -496,7 +503,7 @@ class GazeboTester(GazeboMaster):
         print("All cleaned up")
 
 
-class MultiMasterCoordinator:
+class MultiMasterCoordinator(object):
     def __init__(self, result_recorders=None, gazebo=None, model=None, best_configs=None, ranges=None, path=None,
                  suffix=''):
         if result_recorders is None:
@@ -544,7 +551,7 @@ class MultiMasterCoordinator:
     def startProcesses(self):
         self.ros_port = 11311
         self.gazebo_port = self.ros_port + 100
-        for ind in xrange(self.num_masters):
+        for ind in range(self.num_masters):
             self.addProcess()
 
     def addProcess(self):
@@ -612,7 +619,7 @@ class MultiMasterCoordinator:
             try:
                 task = queue.get(block=False)
                 result_string = "Result of ["
-                for k, v in task.iteritems():
+                for k, v in task.items():
                     # if "result" not in k:
                     result_string += str(k) + ":" + str(v) + ","
                 result_string += "]"
@@ -632,7 +639,7 @@ class MultiMasterCoordinator:
 
                 # print "Result of " + task["world"] + ":" + task["controller"] + "= " + str(task["result"])
                 queue.task_done()
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 # print "No results!"
                 time.sleep(1)
 
@@ -708,7 +715,7 @@ def find_best_config(dir, params, path):
     file = [dir + f for f in os.listdir(dir) if os.path.isfile(dir + f)]
     best_config = {}
     seed = find_all_success(file)
-    for p in params.keys():
+    for p in list(params.keys()):
         range_list = list(params[p]['range'])
         l = len(range_list)
         score = np.zeros(l)
@@ -755,7 +762,7 @@ def find_best_config(dir, params, path):
 
 
 def normalize(x):
-    return (x - np.mean(x)) / np.std(x)
+    return old_div((x - np.mean(x)), np.std(x))
 
 
 def find_rank(array):
@@ -863,7 +870,7 @@ def find_max(interval=1):
 def find_results(dir, params, seed=None):
     file = [dir + f for f in os.listdir(dir) if os.path.isfile(dir + f)]
     results = {}
-    for p in params.keys():
+    for p in list(params.keys()):
         # range_list = list(params[p]['range'])
         # l = len(range_list)
         # score = np.zeros(l)

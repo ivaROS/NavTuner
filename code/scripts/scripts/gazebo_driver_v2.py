@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import rospy
 import random
 import sys, os, time
@@ -52,7 +58,7 @@ def load_model_xml(filename):
     return model_xml
 
 
-class GazeboDriver():
+class GazeboDriver(object):
     # Copied from pips_test: gazebo_driver.py
     def rechoose_barrel_points(self, p, off, start, goal, D):
         barrels = p + off
@@ -61,14 +67,14 @@ class GazeboDriver():
             dy = b[1] - start[1]
             d = np.sqrt(dx ** 2 + dy ** 2)
             if d < D:
-                b[0] = dx * D / d + start[0]
-                b[1] = dy * D / d + start[1]
+                b[0] = old_div(dx * D, d) + start[0]
+                b[1] = old_div(dy * D, d) + start[1]
             dx = b[0] - goal[0]
             dy = b[1] - goal[1]
             d = np.sqrt(dx ** 2 + dy ** 2)
             if d < D:
-                b[0] += dx * D / d + goal[0]
-                b[1] += dy * D / d + goal[1]
+                b[0] += old_div(dx * D, d) + goal[0]
+                b[1] += old_div(dy * D, d) + goal[1]
         return barrels - p
 
     def statesCallback(self, data):  # This comes in at ~100hz
@@ -447,8 +453,8 @@ class GazeboDriver():
             ymin = np.amin(ymins)
             ymax = np.amax(ymaxs)
             # Get a dense grid of points
-            grid_size_x = (xmax - xmin) / region_num
-            grid_size_y = (ymax - ymin) / region_num
+            grid_size_x = old_div((xmax - xmin), region_num)
+            grid_size_y = old_div((ymax - ymin), region_num)
             grids = np.mgrid[xmin:xmax + .01:grid_size_x, ymin:ymax + .01:grid_size_y]
             # density = [144, 169, 196, 225, 256]  # 49, 64, 81, 100, 121, 144, 169, 196, 225, 256
             # '''
@@ -473,7 +479,7 @@ class GazeboDriver():
                     depth = xxmax - xxmin
                     width = yymax - yymin
                     length = min(depth, width)
-                    while n < round(num_barrels / (region_num ** 2)) and k < round(max_tries / (region_num ** 2)):
+                    while n < round(old_div(num_barrels, (region_num ** 2))) and k < round(old_div(max_tries, (region_num ** 2))):
                         a = self.random.random()
                         b = self.random.random()
                         x = xxmin + a * length
@@ -544,8 +550,8 @@ class GazeboDriver():
             # '''
             region_weights = np.random.random(len(xmins))
             self.region_barrel = np.zeros_like(region_weights)
-            region_weights = region_weights / (np.sum(region_weights))
-            region_inds = range(len(xmins))
+            region_weights = old_div(region_weights, (np.sum(region_weights)))
+            region_inds = list(range(len(xmins)))
             sampled_regions = self.nprandom.choice(region_inds, replace=True, p=region_weights, size=max_tries)
             n = 0
             i = 0
@@ -604,7 +610,7 @@ class GazeboDriver():
         self.nprandom = np.random.RandomState(self.seed)
 
     def getRandInt(self, lower, upper):
-        a = range(lower, upper + 1)
+        a = list(range(lower, upper + 1))
         start = self.random.choice(a)
         a.remove(start)
         end = self.random.choice(a)

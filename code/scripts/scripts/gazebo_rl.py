@@ -1,5 +1,9 @@
 from __future__ import print_function
-import Queue
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+import queue
 import multiprocessing as mp
 import os
 import pickle
@@ -164,7 +168,7 @@ class GazeboRL(GazeboTester):
                     print(result, file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
@@ -314,7 +318,7 @@ class GazeboRLBC(GazeboTester):
                     print(result, file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()
@@ -465,7 +469,7 @@ class GazeboRLPredict(GazeboTester):
                     print(result, file=sys.stderr)
 
 
-            except Queue.Empty as e:
+            except queue.Empty as e:
                 with self.soft_kill_flag.get_lock():
                     if self.soft_kill_flag.value:
                         self.shutdown()

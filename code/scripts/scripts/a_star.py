@@ -1,3 +1,4 @@
+from builtins import object
 class AStarGraph(object):
 
     def __init__(self, barriers, xmax, ymax):

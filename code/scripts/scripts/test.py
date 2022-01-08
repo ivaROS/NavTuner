@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 import os
 import rospy
 import rospkg
@@ -70,7 +72,7 @@ def find_results(dir):
 def moving_average(a, n=3):
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
-    return ret[n - 1:] / n
+    return old_div(ret[n - 1:], n)
 
 
 def combine_models(params, models, save_path):

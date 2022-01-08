@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import rospy
 import sys, os, time
 import random
@@ -125,10 +128,10 @@ def barrel_points(xmin, ymin, xmax, ymax, grid_size, num_barrels):
     # Get a dense grid of points
     points = np.mgrid[xmin:xmax:grid_size, ymin:ymax:grid_size]
     points = points.swapaxes(0, 2)
-    points = points.reshape(points.size / 2, 2)
+    points = points.reshape(old_div(points.size, 2), 2)
 
     # Choose random indexes
-    idx = random.sample(range(points.shape[0]), num_barrels)
+    idx = random.sample(list(range(points.shape[0])), num_barrels)
     print(idx)
 
     # Generate offsets

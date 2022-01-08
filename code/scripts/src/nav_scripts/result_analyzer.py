@@ -1,4 +1,12 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import filter
+from builtins import next
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import object
+from past.utils import old_div
 import csv
 import time
 import math
@@ -19,7 +27,7 @@ def isMatch(entry, key, value):
 
 def convertToStrings(dict):
     if dict is not None:
-        for key, value in dict.items():
+        for key, value in list(dict.items()):
             if not isinstance(value, basestring):
                 if isinstance(value, list):
                     for i in range(len(value)):
@@ -34,17 +42,17 @@ def filter(results, whitelist=None, blacklist=None, defaults=None):
     for entry in results:
         stillgood = True
         if whitelist is not None:
-            for key, value in whitelist.items():
+            for key, value in list(whitelist.items()):
                 if not isMatch(entry, key, value):
                     stillgood = False
                     break
         if blacklist is not None:
-            for key, value in blacklist.items():
+            for key, value in list(blacklist.items()):
                 if isMatch(entry, key, value):
                     stillgood = False
                     break
         if defaults is not None:
-            for key, value in defaults.items():
+            for key, value in list(defaults.items()):
                 if key not in entry:
                     entry[key] = value
         if stillgood:
@@ -70,11 +78,11 @@ def getPrunedList(results, keys):
 
 
 
-class ResultAnalyzer:
+class ResultAnalyzer(object):
 
     def readFile(self, filename, whitelist = None, blacklist = None, defaults=None):
         result_list = readFile(filename)
-        filtered_list = filter(result_list, whitelist=whitelist, blacklist=blacklist, defaults=defaults)
+        filtered_list = list(filter(result_list, whitelist=whitelist, blacklist=blacklist, defaults=defaults))
         self.results += filtered_list
 
     def readFiles(self, filenames, whitelist=None, blacklist = None, defaults=None):
@@ -112,7 +120,7 @@ class ResultAnalyzer:
     '''
 
     def getCases(self, whitelist=None, blacklist=None):
-        return filter(self.results, whitelist=whitelist, blacklist=blacklist)
+        return list(filter(self.results, whitelist=whitelist, blacklist=blacklist))
 
     def getCases2(self, whitelist=None, blacklist=None):
         return self.getCases(whitelist=whitelist, blacklist=blacklist)
@@ -147,7 +155,7 @@ class ResultAnalyzer:
         key_values = {}
         for entry in self.results:
             condition = {key: entry[key] for key in independent + dependent}
-            conditionset = frozenset(condition.items())
+            conditionset = frozenset(list(condition.items()))
             
             #print conditionset
             
@@ -156,7 +164,7 @@ class ResultAnalyzer:
             else:
                 statistics[conditionset] = statistics[conditionset] + 1
 
-            for key, value in condition.items():
+            for key, value in list(condition.items()):
                 if not key in key_values:
                     key_values[key] = set()
                 key_values[key].add(value)
@@ -165,15 +173,15 @@ class ResultAnalyzer:
            for controller in sorted(key_values[independent[1]]):
                 total = 0
                 for result in key_values[dependent[0]]:
-                    key = frozenset({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items())
+                    key = frozenset(list({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items()))
                     if key in statistics:
                         total+= statistics[key]
                 print(controller + " controller:")
                 for result in key_values[dependent[0]]:
                     key = frozenset(
-                        {independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items())
+                        list({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items()))
                     if key in sorted(statistics):
-                        num = statistics[frozenset({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items())]
+                        num = statistics[frozenset(list({independent[1]: controller, independent[0]: num_barrels, dependent[0]: result}.items()))]
                         print(result + ": " + str(num) + "\t" + str(float(num)/total))
                 print("")
 
@@ -184,7 +192,7 @@ class ResultAnalyzer:
         path_lengths = {}
         for entry in self.results:
             condition = {key: entry[key] for key in ["controller", "scenario"] + ["result"]}
-            conditionset = frozenset(condition.items())
+            conditionset = frozenset(list(condition.items()))
 
             # print conditionset
 
@@ -197,7 +205,7 @@ class ResultAnalyzer:
                 path_times[conditionset].append(int(entry["time"]))
                 path_lengths[conditionset].append(float(entry["path_length"]))
 
-            for key, value in condition.items():
+            for key, value in list(condition.items()):
                 if not key in key_values:
                     key_values[key] = set()
                 key_values[key].add(value)
@@ -224,18 +232,18 @@ class ResultAnalyzer:
                 total = 0
                 for result in key_values["result"]:
                     key = frozenset(
-                        {"controller": controller, "scenario": scenario, "result": result}.items())
+                        list({"controller": controller, "scenario": scenario, "result": result}.items()))
                     if key in statistics:
                         total += statistics[key]
 
                 print(("| " + str(controller)), end=' ')
                 for result in key_values["result"]:
                     key = frozenset(
-                        {"controller": controller, "scenario": scenario, "result": result}.items())
+                        list({"controller": controller, "scenario": scenario, "result": result}.items()))
                     if key in sorted(statistics):
-                        lookupkey = frozenset({"controller": controller, "scenario": scenario, "result": result}.items())
+                        lookupkey = frozenset(list({"controller": controller, "scenario": scenario, "result": result}.items()))
                         num = statistics[lookupkey]
-                        path_time = np.mean(np.array(path_times[lookupkey]))/1e9
+                        path_time = old_div(np.mean(np.array(path_times[lookupkey])),1e9)
                         path_length = np.mean(np.array(path_lengths[lookupkey]))
 
                         print(("| " + "{0:.1f}".format(100*float(num) / total) + "% (" + str(num) + ") " + "<br>" + "{0:.2f}".format(path_length) + "m" + " <br>" + "{0:.2f}".format(path_time) + "s"), end=' ')
@@ -253,7 +261,7 @@ class ResultAnalyzer:
         results = self.getCases(whitelist=whitelist, blacklist=blacklist)
         for entry in results:
             condition = {key: entry[key] for key in independent + [dependent]}
-            conditionset = frozenset(condition.items())
+            conditionset = frozenset(list(condition.items()))
 
             # print conditionset
 
@@ -273,7 +281,7 @@ class ResultAnalyzer:
             path_times[conditionset][entry['seed']] += [int(entry["time"])]
             path_lengths[conditionset][entry['seed']] += [float(entry["path_length"])]
 
-            for key, value in condition.items():
+            for key, value in list(condition.items()):
                 if not key in key_values:
                     key_values[key] = set()
                 key_values[key].add(value)
@@ -286,13 +294,13 @@ class ResultAnalyzer:
                 lookup_keys = []
                 total=0
                 for dependent_value in key_values[dependent]: #TODO: use all permutations of multiple dependents
-                    key = frozenset(shared_conditions_dict.items() + {dependent: dependent_value}.items())
+                    key = frozenset(list(shared_conditions_dict.items()) + list({dependent: dependent_value}.items()))
                     if key in statistics:
                         total += statistics[key]
 
                 #print("| " + str(controller)),
                 for dependent_value in key_values[dependent]:
-                    lookupkey = frozenset(shared_conditions_dict.items() + {dependent: dependent_value}.items())
+                    lookupkey = frozenset(list(shared_conditions_dict.items()) + list({dependent: dependent_value}.items()))
                     if lookupkey in statistics:
                         num = statistics[lookupkey]
                         #path_time = np.mean(np.array(path_times[lookupkey])) / 1e9
@@ -308,14 +316,14 @@ class ResultAnalyzer:
                         print(("| "), end=' ')
 
                 dependent_value="SUCCEEDED"
-                lookupkey = frozenset(shared_conditions_dict.items() + {dependent: dependent_value}.items())
+                lookupkey = frozenset(list(shared_conditions_dict.items()) + list({dependent: dependent_value}.items()))
                 if lookupkey in statistics:
                     if shared_safe_keys is None:
-                        shared_safe_keys = path_times[lookupkey].keys()
+                        shared_safe_keys = list(path_times[lookupkey].keys())
 
                     times =[path_times[lookupkey][k] for k in shared_safe_keys]
                     times = np.array(sum(times, []))
-                    path_time = np.mean(times) / 1e9
+                    path_time = old_div(np.mean(times), 1e9)
 
                     path_length =[path_lengths[lookupkey][k] for k in shared_safe_keys]
                     path_length = np.array(sum(path_length, []))
@@ -338,11 +346,11 @@ class ResultAnalyzer:
                     dependent_value = "SUCCEEDED"
                     if 'controller' in key_values:
                         for controller in key_values['controller']:
-                            lookupkey = frozenset(shared_conditions_dict.items() + {dependent: dependent_value, 'controller': controller}.items())
+                            lookupkey = frozenset(list(shared_conditions_dict.items()) + list({dependent: dependent_value, 'controller': controller}.items()))
 
                             if lookupkey in path_times:
                                 controller_safe_keys = path_times[lookupkey]
-                                controller_safe_keys = controller_safe_keys.keys()
+                                controller_safe_keys = list(controller_safe_keys.keys())
                                 if safe_keys is None:
                                     safe_keys = set(controller_safe_keys)
                                 else:
@@ -390,7 +398,7 @@ class ResultAnalyzer:
         path_lengths = {}
         for entry in self.results:
             condition = {key: entry[key] for key in ["controller", "scenario"] + ["result"]}
-            conditionset = frozenset(condition.items())
+            conditionset = frozenset(list(condition.items()))
 
             # print conditionset
 
@@ -403,7 +411,7 @@ class ResultAnalyzer:
                 path_times[conditionset].append(int(entry["time"]))
                 path_lengths[conditionset].append(float(entry["path_length"]))
 
-            for key, value in condition.items():
+            for key, value in list(condition.items()):
                 if not key in key_values:
                     key_values[key] = set()
                 key_values[key].add(value)
@@ -431,18 +439,18 @@ class ResultAnalyzer:
                 total = 0
                 for result in key_values["result"]:
                     key = frozenset(
-                        {"controller": controller, "scenario": scenario, "result": result}.items())
+                        list({"controller": controller, "scenario": scenario, "result": result}.items()))
                     if key in statistics:
                         total += statistics[key]
 
                 result = "SUCCEEDED"
 
                 key = frozenset(
-                    {"controller": controller, "scenario": scenario, "result": result}.items())
+                    list({"controller": controller, "scenario": scenario, "result": result}.items()))
                 if key in sorted(statistics):
-                    lookupkey = frozenset({"controller": controller, "scenario": scenario, "result": result}.items())
+                    lookupkey = frozenset(list({"controller": controller, "scenario": scenario, "result": result}.items()))
                     num = statistics[lookupkey]
-                    path_time = np.mean(np.array(path_times[lookupkey])) / 1e9
+                    path_time = old_div(np.mean(np.array(path_times[lookupkey])), 1e9)
                     path_length = np.mean(np.array(path_lengths[lookupkey]))
 
                     print(("| " + "{0:.1f}".format(100 * float(num) / total) + "% <br>" + "{0:.2f}".format(path_length) + "m"), end=' ')
@@ -461,7 +469,7 @@ class ResultAnalyzer:
         key_values = {}
         for entry in self.results:
             condition = {key: entry[key] for key in independent}
-            conditionset = frozenset(condition.items())
+            conditionset = frozenset(list(condition.items()))
             self.frozen_set.append(conditionset)
 
     def getAverageTime(self, tasks):
@@ -472,16 +480,16 @@ class ResultAnalyzer:
             total_time += t
             num_tasks += 1
             
-        avg_time = total_time/num_tasks if num_tasks > 0 else 0
-        print(': ' + str(avg_time/1e9)) #tasks[0]['controller'] +
+        avg_time = old_div(total_time,num_tasks) if num_tasks > 0 else 0
+        print(': ' + str(old_div(avg_time,1e9))) #tasks[0]['controller'] +
 
     def contains(self, task):
-        stripped_task = {str(key): str(task[key]) for key,value in task.items()}
-        stripped_task = frozenset(stripped_task.items())
+        stripped_task = {str(key): str(task[key]) for key,value in list(task.items())}
+        stripped_task = frozenset(list(stripped_task.items()))
 
         for entry in self.results:
-            condition = {key: entry[key] for key,value in task.items() if key in entry}
-            conditionset = frozenset(condition.items())
+            condition = {key: entry[key] for key,value in list(task.items()) if key in entry}
+            conditionset = frozenset(list(condition.items()))
             if conditionset == stripped_task:
                 if 'result' in entry: #and (entry['result'] == 'SUCCEEDED' or entry['result'] == 'BUMPER_COLLISION'):
                     return True
@@ -489,12 +497,12 @@ class ResultAnalyzer:
         return False
 
     def getMatchingResult(self, task):
-        stripped_task = {str(key): str(task[key]) for key,value in task.items()}
-        stripped_task = frozenset(stripped_task.items())
+        stripped_task = {str(key): str(task[key]) for key,value in list(task.items())}
+        stripped_task = frozenset(list(stripped_task.items()))
 
         for entry in self.results:
-            condition = {key: entry[key] for key,value in task.items()}
-            conditionset = frozenset(condition.items())
+            condition = {key: entry[key] for key,value in list(task.items())}
+            conditionset = frozenset(list(condition.items()))
             if conditionset == stripped_task:
                 return entry
 
@@ -537,7 +545,7 @@ class ResultAnalyzer:
                 task2 = self.getMatchingResult(task2)
                 if task2 is not None:
                     condition = {task1['result']:task2['result']}
-                    conditionset = frozenset(condition.items())
+                    conditionset = frozenset(list(condition.items()))
 
                     # print conditionset
 
@@ -548,6 +556,6 @@ class ResultAnalyzer:
 
 
         print(controller1 + " : " + controller2)
-        for key,value in statistics.items():
+        for key,value in list(statistics.items()):
             print(str(next(iter(key))) + " : " + str(value))
 
