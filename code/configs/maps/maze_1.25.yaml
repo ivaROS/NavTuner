@@ -1,4 +1,4 @@
-image: /home/haoxin/catkin_ws/src/navigation_test/configs/maps/maze_1.25.pgm
+image: maze_1.25.pgm
 resolution: 0.100000
 origin: [-13.630480, -13.498890, 0.000000]
 negate: 0
