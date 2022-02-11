@@ -52,9 +52,9 @@ class GazeboRL(GazeboTester):
                     r = recorders.get_recorders(recorder)
                     recorder_list.append(r)
                     r.start()
-                    if r.key is 'predict':
+                    if r.key == 'predict':
                         predict_recorder = r
-                    if r.key is 'reward':
+                    if r.key == 'reward':
                         reward_recorder = r
                     # recorders.get_recorders(recorder)
                 scenario = scenarios.getScenario(task)
@@ -148,15 +148,15 @@ class GazeboRL(GazeboTester):
                     task["result"] = result
                 task["pid"] = os.getpid()
                 for recorder in recorder_list:
-                    if recorder.key is 'result':
+                    if recorder.key == 'result':
                         recorder.write(task['result'])
-                    elif recorder.key is 'time':
+                    elif recorder.key == 'time':
                         recorder.write(task['time'])
-                    elif recorder.key is 'path_length':
+                    elif recorder.key == 'path_length':
                         recorder.write(task['path_length'])
-                    elif recorder.key is 'params':
+                    elif recorder.key == 'params':
                         recorder.write(convert_dict('std_msgs/Float32', task['params']))
-                    elif recorder.key is 'laser_scan':
+                    elif recorder.key == 'laser_scan':
                         recorder.close()
                 recorders.close()
                 print("result saved!")
@@ -223,7 +223,7 @@ class GazeboRLBC(GazeboTester):
                     r = recorders.get_recorders(recorder)
                     recorder_list.append(r)
                     r.start()
-                    if r.key is 'predict':
+                    if r.key == 'predict':
                         predict_recorder = r
                 scenario = scenarios.getScenario(task)
 
@@ -298,15 +298,15 @@ class GazeboRLBC(GazeboTester):
                     task["result"] = result
                 task["pid"] = os.getpid()
                 for recorder in recorder_list:
-                    if recorder.key is 'result':
+                    if recorder.key == 'result':
                         recorder.write(task['result'])
-                    elif recorder.key is 'time':
+                    elif recorder.key == 'time':
                         recorder.write(task['time'])
-                    elif recorder.key is 'path_length':
+                    elif recorder.key == 'path_length':
                         recorder.write(task['path_length'])
-                    elif recorder.key is 'params':
+                    elif recorder.key == 'params':
                         recorder.write(convert_dict('std_msgs/Float32', task['params']))
-                    elif recorder.key is 'laser_scan':
+                    elif recorder.key == 'laser_scan':
                         recorder.close()
                 recorders.close()
                 print("result saved!")
@@ -373,7 +373,7 @@ class GazeboRLPredict(GazeboTester):
                     r = recorders.get_recorders(recorder)
                     recorder_list.append(r)
                     r.start()
-                    if r.key is 'predict':
+                    if r.key == 'predict':
                         predict_recorder = r
                     # recorders.get_recorders(recorder)
                 scenario = scenarios.getScenario(task)
@@ -449,15 +449,15 @@ class GazeboRLPredict(GazeboTester):
                     task["result"] = result
                 task["pid"] = os.getpid()
                 for recorder in recorder_list:
-                    if recorder.key is 'result':
+                    if recorder.key == 'result':
                         recorder.write(task['result'])
-                    elif recorder.key is 'time':
+                    elif recorder.key == 'time':
                         recorder.write(task['time'])
-                    elif recorder.key is 'path_length':
+                    elif recorder.key == 'path_length':
                         recorder.write(task['path_length'])
-                    elif recorder.key is 'params':
+                    elif recorder.key == 'params':
                         recorder.write(convert_dict('std_msgs/Float32', task['params']))
-                    elif recorder.key is 'laser_scan':
+                    elif recorder.key == 'laser_scan':
                         recorder.close()
                 recorders.close()
                 print("result saved!")
@@ -615,7 +615,7 @@ def train(save_path, suffix, checkpoint=None, aux=False, double=False):
     print("Total time: " + str(end_time - start_time))
 
 
-def test(read_path, save_path, suffix='dqn', scene=None, double=False, id=0):
+def not_a_test(read_path, save_path, suffix='dqn', scene=None, double=False, id=0):
     result_recorders = [{"topic": "result"}, {"topic": "time"}, {"topic": "path_length"},
                         {"topic": "predict"}]
     # values = [0.0625, 0.125, 0.25, 0.5, 1.0]  #
@@ -679,9 +679,12 @@ def print_result(save_path, suffix=['dqn']):
 
 if __name__ == '__main__':
     # '''
-    save_path = 'data/rl/max_depth/'
+    save_path = '~/simulation_data/torch/rl/max_depth/'
     checkpoint = 'data/rl/max_depth/model/dqn/dqns640seed15000.pt'
     # train(save_path, suffix='dqn', checkpoint=checkpoint, aux=False, double=True)
+    train(save_path, suffix='dqn', checkpoint=None, aux=False, double=True)
+
+    exit()
     # read_path = 'data/training/depth_planner_freq/'
     # warm_start(read_path, save_path, suffix='dqn', aux=False, double=True)
     # '''
@@ -697,6 +700,6 @@ if __name__ == '__main__':
                 print(id)
                 save_path = 'data/rl' + folder[id] + scene + '/' + str(seed)
                 checkpoint = read_path + 'dqns640seed'+str(seed)+'.pt'
-                test(checkpoint, save_path, suffix='dqn', scene=scene, double=True, id=id)
+                not_a_test(checkpoint, save_path, suffix='dqn', scene=scene, double=True, id=id)
                 print_result(save_path, ['dqn', 'bc_dqn'])
     # '''
