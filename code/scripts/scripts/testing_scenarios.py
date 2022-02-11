@@ -676,7 +676,7 @@ class MazeScenario(TestingScenario):
         self.seed = task["seed"] if "seed" in task else 0
         rospack = rospkg.RosPack()
         maze_file = task['maze_file'] if 'maze_file' in task else 'maze_1.25.pickle'
-        self.maze = pickle.load(open(maze_file, 'rb'))
+        self.maze = pickle.load(open(maze_file, 'rb'), encoding='latin1')
         self.use_maze = True
         points = np.where(self.maze > 0)
         self.maze_barrels = list(np.array(list(zip(.49 * (points[0] + 1) - 10, .49 * (points[1] + 1) - 10))))
