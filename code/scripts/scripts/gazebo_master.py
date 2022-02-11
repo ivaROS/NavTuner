@@ -573,7 +573,7 @@ class MultiMasterCoordinator(object):
 
         time.sleep(1)
 
-    def processResults(self, queue):
+    def processResults(self, result_queue):
         '''
         # outputfile_name = "~/Documents/dl3_gazebo_results_" + str(datetime.datetime.now())
         outputfile_name = "/data/fall2018/chapter_experiments/chapter_experiments_" + str(datetime.datetime.now())
@@ -617,7 +617,7 @@ class MultiMasterCoordinator(object):
                     '''
         while not self.should_shutdown:  # This means that results stop getting saved to file as soon as I try to kill it
             try:
-                task = queue.get(block=False)
+                task = result_queue.get(block=False)
                 result_string = "Result of ["
                 for k, v in task.items():
                     # if "result" not in k:
@@ -638,7 +638,7 @@ class MultiMasterCoordinator(object):
                     self.addProcess()
 
                 # print "Result of " + task["world"] + ":" + task["controller"] + "= " + str(task["result"])
-                queue.task_done()
+                result_queue.task_done()
             except queue.Empty as e:
                 # print "No results!"
                 time.sleep(1)
