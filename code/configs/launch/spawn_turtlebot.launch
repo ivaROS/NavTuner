@@ -13,7 +13,7 @@
 
       <!-- Gazebo model spawner -->
       <node name="spawn_turtlebot_model" pkg="gazebo_ros" type="spawn_model"
-            args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model mobile_base -reference_frame DefaultStart -b"/>
+            args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model mobile_base -b"/>
       
       <!-- Velocity muxer -->
       <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"  required="true"/>
@@ -47,6 +47,11 @@
 
   <!--END turtlebot_gazebo turtlebot_world.launch -->
   
-  <node name="map_odom_publisher" pkg="gazebo_utils" type="map_transform_publisher" required="true"/>
-  
+  <node name="map_odom_publisher" pkg="gazebo_fake_localization" type="gazebo_fake_localization" required="true" launch-prefix="">
+    <param name="odom_frame_id" value="odom"/>
+  </node>
+
+  <param name="base_frame_id" value="base_footprint"/>
+  <param name="fixed_frame_id" value="map"/>
+  <param name="odom_frame_id" value="odom"/>
 </launch>

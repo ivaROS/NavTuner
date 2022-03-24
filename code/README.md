@@ -18,13 +18,15 @@ There are two packages under this repository, ```nav_scripts``` and ```nav_confi
 	* ```tf```
 	* ```turtlebot_bringup```
 * python scripts for running manual/automatic experiments
-	* ```python==2.7```
-	* ```numpy```
-	* ```pickle```
-* python scripts for running NavTuners
-	* ```pytorch```
-	* ```scikit-learn```
-	* ```tqdm```
+    * ```python==2.7```
+    * ```numpy```
+    * ```pickle```
+    * ```rospy-message-converter```
+* python dependencies for running NavTuners
+    * ```pytorch```
+    * ```scikit-learn```
+    * ```scikit-image```
+    * ```tqdm```
 	
 ### Local Planners
 To begin with, you'll need a local planner of your choice that is implemented as a ```nav_core:BaseLocalPlanner``` plugin to the ```move_base``` navigation stack. To run our experiments, you'll need the [egoTEB](https://github.com/ivaROS/egoTEB) package.

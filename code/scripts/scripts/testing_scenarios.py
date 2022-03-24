@@ -871,25 +871,83 @@ class MazeRLScenario(MazePredictScenario):
         # barriers = set()
         start = tuple(np.round((np.array(self.start_pose)[:2] + 10.) * multiplier))
         goal = tuple(np.round((np.array(self.goal_pose)[:2] + 10.) * multiplier))
-        from d_star.d_star import DStar
-        pf = DStar(x_start=int(start[0]), y_start=int(start[1]),
-                   x_goal=int(goal[0]), y_goal=int(goal[1]))
+
+        grid = np.zeros((int(2 * 10 * multiplier), int(2 * 10 * multiplier)))
+        # from d_star.d_star import DStar
+        # pf = DStar(x_start=int(start[0]), y_start=int(start[1]),
+        #           x_goal=int(goal[0]), y_goal=int(goal[1]))
         for b in barrier:
             for i in range(4):
                 for j in range(4):
-                    pf.update_cell(int(b[0] - i), int(b[1] - j), -1)
-                    pf.update_cell(int(b[0] - i), int(b[1] + j), -1)
-                    pf.update_cell(int(b[0] + i), int(b[1] + j), -1)
-                    pf.update_cell(int(b[0] + i), int(b[1] - j), -1)
-                    # barriers.add((int(b[0] - i), int(b[1] - j)))
-                    # barriers.add((int(b[0] - i), int(b[1] + j)))
-                    # barriers.add((int(b[0] + i), int(b[1] + j)))
-                    # barriers.add((int(b[0] + i), int(b[1] - j)))
-            # barriers.add((int(b[0]), int(b[1])))
+                    grid[int(b[0] - i), int(b[1] - j)] = 1
+                    grid[int(b[0] - i), int(b[1] + j)] = 1
+                    grid[int(b[0] + i), int(b[1] + j)] = 1
+                    grid[int(b[0] + i), int(b[1] - j)] = 1
+
         # graph = AStarGraph(barriers, 200, 200)
         # path, _ = AStarSearch((int(start[0]), int(start[1])), (int(goal[0]), int(goal[1])), graph)
-        pf.replan()
-        path = pf.get_path()
+        #pf.replan()
+        #path = pf.get_path()
+
+        from heapq import heappop, heappush
+
+        def heuristic(a, b):
+            return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+
+        def astar(array, start, goal):
+            neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+            close_set = set()
+            came_from = {}
+            gscore = {start: 0}
+            fscore = {start: heuristic(start, goal)}
+            oheap = []
+
+            heappush(oheap, (fscore[start], start))
+
+            while oheap:
+
+                current = heappop(oheap)[1]
+
+                if current == goal:
+                    data = []
+                    while current in came_from:
+                        data.append(current)
+                        current = came_from[current]
+                    return data
+
+                close_set.add(current)
+                for i, j in neighbors:
+                    neighbor = current[0] + i, current[1] + j
+                    tentative_g_score = gscore[current] + heuristic(current, neighbor)
+                    if 0 <= neighbor[0] < array.shape[0]:
+                        if 0 <= neighbor[1] < array.shape[1]:
+                            if array[neighbor[0]][neighbor[1]] == 1:
+                                continue
+                        else:
+                            # array bound y walls
+                            continue
+                    else:
+                        # array bound x walls
+                        continue
+
+                    if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
+                        continue
+
+                    if tentative_g_score < gscore.get(neighbor, 0) or neighbor not in [i[1] for i in oheap]:
+                        came_from[neighbor] = current
+                        gscore[neighbor] = tentative_g_score
+                        fscore[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                        heappush(oheap, (fscore[neighbor], neighbor))
+
+            return False
+
+        path = astar(array=grid, start=start, goal=goal)
+        print(path)
+
+
+
+
         self.path = old_div(np.array(path), multiplier) - 10.
         # dt = time.time() - st
         # print(dt)
